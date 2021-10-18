@@ -9,4 +9,4 @@ Identity.com grants users, requesters, and validators around the world access to
 
 ## Projects
 
-[Cryptid](docs.identity.com/cryptid)
+[Cryptid](./cryptid)
