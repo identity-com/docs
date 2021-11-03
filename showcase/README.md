@@ -25,16 +25,21 @@ $ docker run -it node:16 /bin/bash
 ```shell
 $ sh -c "$(curl -sSfL https://release.solana.com/v1.8.1/install)"
 
+# Export the given path (or and add it to .profile (or equivalent for your shell)) e.g.
+$ export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+
+$ solana --version
+
+# Setup a new key-pair for the demo
 $ solana-keygen new
 
+# We do this demo in Devnet
 $ solana config set -u devnet
 ```
 
 ### SOL DID Client
 ```shell
 $ yarn global add @identity.com/sol-did-client
-
-$ sol --help
 ```
 
 ### Cryptid Client
@@ -84,6 +89,8 @@ $ cryptid key add <pubkey> key2
 $ cryptid document
 
 $ cryptid config set keyFile $(pwd)/key2.json
+
+$ cryptid airdrop
 
 $ cryptid key remove default
 ```
