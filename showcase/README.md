@@ -2,11 +2,23 @@
 
 This guide will take you through the suite of Identity software available on Solana.
 
-## Prerequisites
+## Setup
 
-Node 14+
+For this demo you'll need the following setup on your machine:
+- Node 14+
+- `yarn`
+- Solana Tool Suite (1.8.0+)
+- @identity.com/sol-did-client
+- @identity.com/cryptid-cli
+- @identity.com/solana-gatekeeper-lib
+For demo purposes we will use the `node:16` docker image that comes with `node` and `yarn` 
+and install all relevant software inside this dedicated environment
+```shell
+$ docker run -it node:16 /bin/bash
+```
 
-Solana:
+
+### Solana:
 
 ```shell
 $ sh -c "$(curl -sSfL https://release.solana.com/v1.8.1/install)"
@@ -16,14 +28,32 @@ $ solana-keygen new
 $ solana config set -u devnet
 ```
 
+### SOL DID Client
+```shell
+$ yarn global add @identity.com/sol-did-client
+
+$ sol --help
+```
+
+### Cryptid Client
+```shell
+$ yarn global add @identity.com/cryptid-cli
+
+$ cryptid --help
+```
+
+### Gateway Client
+```shell
+$ yarn global add @identity.com/solana-gatekeeper-lib
+
+$ gateway --help
+```
 
 ## Getting started with did:sol
 
 Goal: Intro to DIDs
 
 ```shell
-$ yarn global add @identity.com/sol-did-client
-
 $ solana address
 
 $ sol did:sol:devnet:$(solana address)
@@ -37,8 +67,6 @@ Visit https://did.civic.com, and resolve the above DID.
 Goal: Add keys to DID documents, introduction to [Cryptid](https://github.com/identity-com/cryptid)
 
 ```shell
-$ yarn global add @identity.com/cryptid-cli
-
 $ cryptid init
 
 $ cryptid config
@@ -105,17 +133,15 @@ $ cryptid controller add -c controlled.yml <UI_DID>
 
 Goal: intro to gateway tokens, permissioned dApps and the gateway CLI
 
-- Visit https://dex-cryptid.civic.finance - controlled cryptid account cannot yet trade (no GT)
+- Visit https://candy.identity,com - controlled cryptid account cannot yet mint NFT (no GT)
 
 ```shell
-$ yarn global add @identity.com/solana-gatekeeper-lib
-
 $ gateway add-gatekeeper -c devnet $(solana address)
 
 $ gateway issue -g $HOME/.config/solana/id.json <CONTROLLED CRYPTID ADDRESS>
 ```
 
-- Trade on https://dex-cryptid.civic.finance 
+- Visit https://candy.identity,com - Mint NFT
 
 ## Credentials & Gateway
 
@@ -126,4 +152,4 @@ Goal: "Real-life" example of a gateway token issuance based on credentials.
 - Scan QR code and onboard with Civic
 - Sign credential with cryptid key
 - Click button to get Gateway Token issued to cryptid account
-- Trade on https://dex-cryptid.civic.finance 
+- Mint NFT https://candy.identity,com
