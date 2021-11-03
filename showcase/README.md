@@ -86,6 +86,8 @@ $ solana-keygen new -o key2.json
 
 $ cryptid key add <pubkey> key2
 
+$ cryptid transfer <pubkey> 1000000
+
 $ cryptid document
 
 $ cryptid config set keyFile $(pwd)/key2.json
@@ -93,6 +95,15 @@ $ cryptid config set keyFile $(pwd)/key2.json
 $ cryptid airdrop
 
 $ cryptid key remove default
+
+$ cryptid document
+
+# Show that the default key is no longer able to transfer
+$ cryptid config set keyFile $HOME/.config/solana/id.json
+
+$ cryptid transfer <pubkey> 1000000
+
+$ cryptid config set keyFile $(pwd)/key2.json
 ```
 
 ## Controllers
@@ -107,7 +118,11 @@ $ cryptid init -k controlled.json -p controlled.yml
 
 $ cryptid config -c controlled.yml
 
-$ cryptid transfer 1_000_000 <NEW_DID>
+# Fund new Cryptid address
+$ cryptid transfer <NEW_DID> 100000000
+
+# Fund Signer #default signer
+$ cryptid transfer <pubkey controlled.json> 100000000
 
 $ cryptid controller add -c controlled.yml <OLD_DID>
 
@@ -121,6 +136,7 @@ $ cryptid balance --as controlled
 
 $ cryptid transfer me 0.1 --as controlled
 ```
+Show balances and transactions in explorer.
 
 ## Cryptid Wallet UI
 
