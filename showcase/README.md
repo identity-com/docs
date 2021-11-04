@@ -161,7 +161,7 @@ Goal: intro to gateway tokens, permissioned dApps and the gateway CLI
 ```shell
 $ gateway add-gatekeeper -c devnet $(solana address)
 
-$ gateway issue -g $HOME/.config/solana/id.json <CONTROLLED CRYPTID ADDRESS>
+$ gateway issue -g $HOME/.config/solana/id.json -c devnet <CONTROLLED CRYPTID ADDRESS>
 ```
 
 - Visit [http://candy.identity.com](http://candy.identity.com) - Mint NFT
