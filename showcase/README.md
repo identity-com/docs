@@ -92,8 +92,6 @@ $ cryptid document
 
 $ cryptid config set keyFile $(pwd)/key2.json
 
-$ cryptid airdrop
-
 $ cryptid key remove default
 
 $ cryptid document
@@ -158,7 +156,7 @@ $ cryptid controller add -c controlled.yml <UI_DID>
 
 Goal: intro to gateway tokens, permissioned dApps and the gateway CLI
 
-- Visit [http://cryptid.identity.com](http://cryptid.identity.com) - controlled cryptid account cannot yet mint NFT (no GT)
+- Visit [http://candy.identity.com](http://candy.identity.com) - controlled cryptid account cannot yet mint NFT (no GT)
 
 ```shell
 $ gateway add-gatekeeper -c devnet $(solana address)
@@ -166,7 +164,7 @@ $ gateway add-gatekeeper -c devnet $(solana address)
 $ gateway issue -g $HOME/.config/solana/id.json <CONTROLLED CRYPTID ADDRESS>
 ```
 
-- Visit [http://cryptid.identity.com](http://cryptid.identity.com) - Mint NFT
+- Visit [http://candy.identity.com](http://candy.identity.com) - Mint NFT
 
 ## Credentials & Gateway
 
@@ -177,4 +175,4 @@ Goal: "Real-life" example of a gateway token issuance based on credentials.
 - Scan QR code and onboard with Civic
 - Sign credential with cryptid key
 - Click button to get Gateway Token issued to cryptid account
-- Mint NFT [http://cryptid.identity.com](http://cryptid.identity.com)
+- Mint NFT [http://candy.identity.com](http://candy.identity.com)
