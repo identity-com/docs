@@ -99,7 +99,7 @@ $ cryptid transfer <pubkey> 1000000
 # View the updated DID document
 $ cryptid document
 
-# Update c- Mint NFT [http://candy.identity.com](http://candy.identity.com)ryptid configuration to use the new key file
+# Update cryptid configuration to use the new key file
 $ cryptid config set keyFile $(pwd)/key2.json
 
 # Remove the key
