@@ -61,27 +61,37 @@ $ gateway --help
 
 Goal: Intro to DIDs
 
+https://www.youtube.com/watch?v=G4vYa0uxYcs
+https://github.com/identity-com/sol-did
+
 ```shell
+# Display your solana address
 $ solana address
 
+# Display the DID document
 $ sol did:sol:devnet:$(solana address)
 ```
 
 Visit [https://did.civic.com](https://did.civic.com), and resolve the above DID.
 
-
 ## Manipulating SOL DIDs
 
-Goal: Add keys to DID documents, introduction to [Cryptid](https://github.com/identity-com/cryptid)
+Below is an introduction to [Cryptid](https://github.com/identity-com/cryptid), a tool for manipulating DID
+documents on Solana. In this example, we will demonstrate key rotation using the cryptid CLI tool by:
+* adding an additional key to your DID
+* removing your original key (e.g. if it has been compromised)
+* retaining access to your cryptid account via the additional key
+
+You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 ```shell
-# Initialize cryptid
+# Initialize cryptid configuration (using your solana key by default)
 $ cryptid init
 
 # View the cryptid configuration
 $ cryptid config
 
-# Shows the DID document (same as above)
+# View your DID document
 $ cryptid document
 
 # Airdop SOL to the signing key and cryptid account
@@ -96,13 +106,13 @@ $ cryptid key add <pubkey> key2
 # Transfer SOL to the new key
 $ cryptid transfer <pubkey> 1000000
 
-# View the updated DID document
+# View the updated DID document (with the additional key added)
 $ cryptid document
 
-# Update cryptid configuration to use the new key file
+# Update cryptid configuration to use the new key by default
 $ cryptid config set keyFile $(pwd)/key2.json
 
-# Remove the key
+# Remove the default key
 $ cryptid key remove default
 
 # Check the updated DID document
@@ -120,7 +130,11 @@ $ cryptid config set keyFile $(pwd)/key2.json
 
 ## Controllers
 
-Goal: Show the power of DID Controllers for joining accounts
+Here we show how you can use [Cryptid](https://github.com/identity-com/cryptid) to setup one DID to be a controller of 
+another DID. For example, if a DID represents a business in the real world, the CEO's DID can be setup as a 
+controller of the business. This will allow the CEO to sign as that business using their own keys.
+
+You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
 
 ```shell
 # Create a new key to demonstrate the controlled cryptid account
@@ -135,7 +149,7 @@ $ cryptid config -c controlled.yml
 # Fund new cryptid address
 $ cryptid transfer <NEW_DID> 100000000
 
-# Fund Signer #default signer !!!!
+# Fund Signer #default signer
 $ cryptid transfer <pubkey controlled.json> 100000000
 
 # Add your main account DID 
@@ -156,7 +170,8 @@ $ cryptid balance --as controlled
 # Transfer SOL on behalf of the controlled cryptid account using the original cryptid account
 $ cryptid transfer me 0.1 --as controlled
 ```
-Show balances and transactions in explorer.
+
+Browse to the link provided to view your transaction on [explorer.identity.com](https://explorer.identity.com/)
 
 ## Cryptid Wallet UI
 
@@ -175,21 +190,27 @@ $ cryptid controller add -c controlled.yml <UI_DID>
 
 ## Gateway
 
-Goal: intro to gateway tokens, permissioned dApps and the gateway CLI
+Here we will show how to issue a gateway token to a cryptid address from a dummy gatekeeper. This example will show
+how you cannot mont a NFT until a gateway token has been issued.
 
-- Visit [http://candy.identity.com](http://candy.identity.com) - controlled cryptid account cannot yet mint NFT (no GT)
+You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
+
+Visit [http://candy.identity.com](http://candy.identity.com) and notice that you cannot yet mint an NFT.
 
 ```shell
-$ gateway add-gatekeeper -c devnet $(solana address)
-
+# Issue a gateway token to your cryptid address
 $ gateway issue -g $HOME/.config/solana/id.json -c devnet <CONTROLLED CRYPTID ADDRESS>
 ```
 
-- Visit [http://candy.identity.com](http://candy.identity.com) - Mint NFT
+Visit [http://candy.identity.com](http://candy.identity.com) again, and notice that you can now mint an NFT.
 
 ## Credentials & Gateway
 
-Goal: "Real-life" example of a gateway token issuance based on credentials.
+Here is an end-to-end showcase to show a "real life" example of a gateway token issuance based on credentials. This will
+show how you cannot mint and NFT until you've gone through a Civic KYC process, signed the credentials with cryptid
+and issued a gateway token to your cryptid account.
+
+You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 - Go to [http://candy.identity.com](http://candy.identity.com) (and fail to mint an NFT)
 - Visit [https://vp-demo.identity.com](https://vp-demo.identity.com)
