@@ -58,7 +58,11 @@ $ cryptid --help
 ```
 
 ### Gateway Client
-The gateway client allows managing of gateway tokens.
+The gateway client allows managing of gateway tokens. A gateway token is required for a user to prove that they have
+been verified by a gatekeeper before being allowed to use certain on-chain applications. The rules required for a 
+gatekeeper to issue a token could include things like age checks, OFAC checks, etc.
+
+More information can be found [here](https://github.com/identity-com/on-chain-identity-gateway).
 
 ```shell
 $ yarn global add @identity.com/solana-gatekeeper-lib
@@ -74,7 +78,7 @@ using the [sol-did](https://github.com/identity-com/sol-did) cli.
 You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=G4vYa0uxYcs
 
 ```shell
-# Display your solana address
+# Display your Solana address
 $ solana address
 
 # Display the DID document
@@ -95,7 +99,7 @@ documents on Solana. In this example, we will demonstrate key rotation using the
 You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 ```shell
-# Initialize Cryptid configuration (using your solana key by default)
+# Initialize Cryptid configuration (using your Solana key by default)
 $ cryptid init
 
 # View the Cryptid configuration
@@ -104,7 +108,7 @@ $ cryptid config
 # View your DID document
 $ cryptid document
 
-# Airdop SOL to the signing key and Cryptid account
+# Airdop SOL to the signing key and Cryptid account (so that we can add additional keys to our account)
 $ cryptid airdrop
 
 # Generate a new Solana key
@@ -172,13 +176,14 @@ $ cryptid alias controlled <NEW_DID>
 $ cryptid alias me <OLD_DID>
 
 # Check the DID document for the controlled Cryptid account. 
-# By using `--as controlled`, we are instructing Cryptid to execute transactions as the controlled account.
+# By using `--as controlled`, we are instructing Cryptid to perform actions using your default DID while controlling
+# the `controlled` DID.
 $ cryptid document --as controlled
 
 # Check the balance for the controlled Cryptid account
 $ cryptid balance --as controlled
 
-# Do a transfer 
+# Perform a transfer transaction using your default account as the controlled account.
 $ cryptid transfer me 0.1 --as controlled
 ```
 
@@ -203,10 +208,10 @@ $ cryptid controller add -c controlled.yml <UI_DID>
 
 ## Gateway
 
-Here we will show how to issue a gateway token to a Cryptid address from a dummy gatekeeper. This example will show
-how you cannot mont a NFT until a gateway token has been issued.
+Here we will show how to issue a gateway token to a Cryptid address from a public dummy gatekeeper. 
+This example will show how you cannot mint a NFT until a gateway token has been issued.
 
-You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
+You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
 
 Visit [http://candy.identity.com](http://candy.identity.com) and notice that you cannot yet mint an NFT.
 
@@ -223,6 +228,9 @@ Here is an end-to-end showcase to show a "real life" example of a gateway token 
 show how you cannot mint and NFT until you've gone through a Civic KYC process, signed the credentials with Cryptid
 and issued a gateway token to your Cryptid account.
 
+Identity.com are partnered with Civic, and the Civic KYC process is used in the demo application. It is not a 
+pre-requisite for receiving a gateway token.
+
 You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 - Go to [http://candy.identity.com](http://candy.identity.com) (and fail to mint an NFT)
@@ -230,5 +238,5 @@ You can go through the steps below and follow along on YouTube: https://www.yout
 - Connect Cryptid wallet
 - Scan QR code and onboard with Civic
 - Sign credential with the Cryptid key
-- Click button to get Gateway Token issued to cryptid account
+- Click button to get Gateway Token issued to your Cryptid account
 - Mint NFT [http://candy.identity.com](http://candy.identity.com)
