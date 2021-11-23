@@ -58,11 +58,11 @@ $ cryptid --help
 ```
 
 ### Gateway Client
-The gateway client allows managing of gateway tokens. A gateway token is required for a user to prove that they have
+The gateway client allows the management of "Gateway Tokens". A gateway token is required for a user to prove that they have
 been verified by a gatekeeper before being allowed to use certain on-chain applications. The rules required for a 
 gatekeeper to issue a token could include things like age checks, OFAC checks, etc.
 
-More information can be found [here](https://github.com/identity-com/on-chain-identity-gateway).
+More information can be found [here](https://identity-com.github.io/on-chain-identity-gateway).
 
 ```shell
 $ yarn global add @identity.com/solana-gatekeeper-lib
@@ -81,7 +81,7 @@ You can follow the steps below and follow along on YouTube: https://www.youtube.
 # Display your Solana address
 $ solana address
 
-# Display the DID document
+# A DID is automatically derived from any solana public key. Display the DID document.
 $ sol did:sol:devnet:$(solana address)
 ```
 
@@ -157,10 +157,11 @@ $ solana-keygen new -o controlled.json
 # Create a Cryptid configuration for the new DID, called `controlled.yml` for the account we are going to control.
 $ cryptid init -k controlled.json -p controlled.yml
 
-# View the configuration of the controlled DID
+# Check the configuration. With the `-c controlled.yml` you are instructing Cryptid to use the config of the new DID
+# instead of the config at `$HOME/.config/cryptid/config.yml`
 $ cryptid config -c controlled.yml
 
-# Fund new Cryptid address so that we can add the controller DID
+# Fund the new DID's Cryptid account so that we can add the controller DID to it
 $ cryptid transfer <NEW_DID> 100000000
 
 # Fund the #default signer
@@ -183,7 +184,7 @@ $ cryptid document --as controlled
 # Check the balance for the controlled Cryptid account
 $ cryptid balance --as controlled
 
-# Perform a transfer transaction using your default account as the controlled account.
+# Perform a transfer transaction from the controlled account, signing with the default account.
 $ cryptid transfer me 0.1 --as controlled
 ```
 
