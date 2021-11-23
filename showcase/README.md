@@ -20,6 +20,7 @@ $ docker run -it node:16 /bin/bash
 ```
 
 ### Solana
+The Solana Tool Suite will allow you to interact with Solana via the cli.  
 
 ```shell
 # Install the Solana tool suite
@@ -39,11 +40,15 @@ $ solana config set -u devnet
 ```
 
 ### SOL DID Client
+The SOL DID client allows you to manage DID documents on Solana.
+
 ```shell
 $ yarn global add @identity.com/sol-did-client
 ```
 
 ### Cryptid Client
+The Cryptid client allows you to manage your cryptid account on the cli.
+
 ```shell
 $ yarn global add @identity.com/cryptid-cli
 
@@ -51,6 +56,8 @@ $ cryptid --help
 ```
 
 ### Gateway Client
+The gateway client allows managing of gateway tokens.
+
 ```shell
 $ yarn global add @identity.com/solana-gatekeeper-lib
 
@@ -59,10 +66,10 @@ $ gateway --help
 
 ## Getting started with did:sol
 
-Goal: Intro to DIDs
+Here we show how to display your Solana address using the Solana client, and displaying your DID document
+using the [sol-did](https://github.com/identity-com/sol-did) cli.
 
-https://www.youtube.com/watch?v=G4vYa0uxYcs
-https://github.com/identity-com/sol-did
+You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=G4vYa0uxYcs
 
 ```shell
 # Display your solana address
@@ -72,17 +79,18 @@ $ solana address
 $ sol did:sol:devnet:$(solana address)
 ```
 
-Visit [https://did.civic.com](https://did.civic.com), and resolve the above DID.
+Visit [https://did.civic.com](https://did.civic.com) and resolve the above DID using the Universal Resolver.
 
 ## Manipulating SOL DIDs
 
 Below is an introduction to [Cryptid](https://github.com/identity-com/cryptid), a tool for manipulating DID
 documents on Solana. In this example, we will demonstrate key rotation using the cryptid CLI tool by:
+
 * adding an additional key to your DID
 * removing your original key (e.g. if it has been compromised)
 * retaining access to your cryptid account via the additional key
 
-You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
+You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 ```shell
 # Initialize cryptid configuration (using your solana key by default)
@@ -134,7 +142,7 @@ Here we show how you can use [Cryptid](https://github.com/identity-com/cryptid) 
 another DID. For example, if a DID represents a business in the real world, the CEO's DID can be setup as a 
 controller of the business. This will allow the CEO to sign as that business using their own keys.
 
-You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
+You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=4oSTRnvnmNM
 
 ```shell
 # Create a new key to demonstrate the controlled cryptid account
@@ -175,13 +183,15 @@ Browse to the link provided to view your transaction on [explorer.identity.com](
 
 ## Cryptid Wallet UI
 
-Goal: preparation for using cryptid in a dApp, show the connection between the basic concepts learned and "real life".
+We can achieve the same controller relationship as above, by adding our cryptid UI wallet as a controller to the account
+created above.
 
 - Visit [http://cryptid.identity.com](http://cryptid.identity.com)
 - Create a new cryptid account by connecting a wallet
 - Airdrop using UI
 
 ```shell
+# Add your UI did as a controller to your CLI account
 $ cryptid controller add -c controlled.yml <UI_DID>
 ```
 
@@ -210,7 +220,7 @@ Here is an end-to-end showcase to show a "real life" example of a gateway token 
 show how you cannot mint and NFT until you've gone through a Civic KYC process, signed the credentials with cryptid
 and issued a gateway token to your cryptid account.
 
-You can follow the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
+You can go through the steps below and follow along on YouTube: https://www.youtube.com/watch?v=72Oo11qy7ug
 
 - Go to [http://candy.identity.com](http://candy.identity.com) (and fail to mint an NFT)
 - Visit [https://vp-demo.identity.com](https://vp-demo.identity.com)
