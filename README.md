@@ -1,12 +1,41 @@
-# Identity.com
+# Website
 
-Decentralized Identity Verification
-Identity.com is an open source ecosystem providing access to on-demand,
-secure identity verification.
+This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
-Governed by a staking mechanism designed to ensure compliance and good behavior within the ecosystem,
-Identity.com grants users, requesters, and validators around the world access to low-cost reusable identity verification powered by CVC tokens.
+### Installation
 
-## Projects
+```
+$ yarn
+```
 
-[Cryptid](./cryptid)
+### Local Development
+
+```
+$ yarn start
+```
+
+This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+
+### Build
+
+```
+$ yarn build
+```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+### Deployment
+
+Using SSH:
+
+```
+$ USE_SSH=true yarn deploy
+```
+
+Not using SSH:
+
+```
+$ GIT_USER=<Your GitHub username> yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
