@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
+  title: 'Identity.com Documentation',
+  tagline: 'Decentralized Identity for everyone.',
   url: 'https://docs.identity.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
