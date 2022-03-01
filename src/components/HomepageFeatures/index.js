@@ -4,42 +4,42 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Gateway Protocol',
+    img: '/img/ICON-gear@2x.png',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+          The Identity.com Gateway Protocol is a cross-chain oracle token model that enables any application
+          operating on a decentralized ledger, such as a dApp, to add a permissioning layer that adheres to a
+          prespecified framework of rules.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Cryptid',
+    img: '/img/CryptidSquid-Large.png',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Cryptid manages your Solana wallet through an on-chain, non-custodial proxy account.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'DIDs and VCs',
+    img: '/img/ICON-mobile-id@2x.png',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        A globally unique identifier that does not require a centralized registration authority because it is
+        registered with distributed ledger technology or other decentralized networks
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({img, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} alt={title} />
+        <img src={img} alt={title} className="feature-img"/>
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
