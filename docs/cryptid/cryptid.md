@@ -252,5 +252,28 @@ in turn, controls.
 
 The initial instructions in a transaction are serialised and added as data to the Cryptid transaction. This
 serialization adds some overhead to the transaction size, meaning that some transactions that initially fit within the
-transaction size limit may now exceed it. On the roadmap are plans to allow transactions to be chunked to avoid this
-limitation.
+transaction size limit may now exceed it.
+
+## Large Transactions
+
+Due to the extra overhead added by Cryptid meta-transactions, the transaction size could exceed the maximum
+packet size allowed by Solana. In that case, `cryptid.sign()` will fail. `cryptid.signLarge()` can be used to split the
+transaction into multiple. These transactions are first stored on-chain using "setup transactions", and then finally the
+whole transaction is executed on chain using an "execute transaction".
+
+The instruction data is stored on chain using a transaction account, which will require additional SOL to be used for
+rent. Once the execute transaction is successfully run, the transaxtion account will be closed and the remaining lamports
+for rent will be returned.
+
+If the execute transaction is not run, the open transactions can be looked up using `listingPendingTx` and manually
+cancelled using `cryptid.cancelLarge()`.
+
+The Cryptid wallet interface allows for handling of large transactions. If the transaction is too large, the interface
+will highlight the failed transactions to the user, and give them the option to expand it.
+
+![Large Failure Screen](screen_large_failure.png)
+![Large Propose Screen](screen_large_propose.png)
+
+If a large transaction is not executed, the user can browse to view any pending transactions and refund the account
+to close and recover the rent.
+![Large Propose Screen](screen_large_pending.png)
