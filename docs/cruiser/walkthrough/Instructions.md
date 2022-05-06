@@ -275,7 +275,7 @@ pub struct MyArgumentComplex<AI> {
 
 As you can see the syntax is nearly the same, I just threw some more stuff in that I'll explain now:
 
-- `generics = [where CustomValidation: ValidateArgument<Arg>]`: This allows us to use generics in the argument positions, very helpful!
+- `generics = [<Arg> where CustomValidation: ValidateArgument<Arg>]`: This allows us to use generics in the argument positions, very helpful!
 - `#[validate(signer)]`: `validate` has a few special functions that can be used:
   - `signer`: This verifies the account is a signer.
     - naked `signer` requires the argument impl `MultiIndexable<()>`.
