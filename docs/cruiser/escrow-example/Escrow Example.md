@@ -46,18 +46,17 @@ pub struct EscrowAccount {
 ```rust
 // A helpful trait that keeps track of account size on chain
 
-impl OnChainSize<()> for EscrowAccount {
-    fn on_chain_max_size(_arg: ()) -> usize {
-        Pubkey::on_chain_static_size() * 3 + u64::on_chain_static_size()
-    }
+impl const OnChainSize for EscrowAccount {
+    const ON_CHAIN_SIZE: usize = Pubkey::ON_CHAIN_SIZE * 3 + u64::ON_CHAIN_SIZE;
 }
 ```
 
 ```rust
-// This is type-safe PDA seeding that prevents you from mixing up seeds
+// This is type-safe PDA seeding that prevents you from mixing up seeds for PDAs
 
 #[derive(Debug)]
 struct EscrowPDASeeder;
+
 impl PDASeeder for EscrowPDASeeder {
     fn seeds<'a>(&'a self) -> Box<dyn Iterator<Item = &'a dyn PDASeed> + 'a> {
         Box::new([&"escrow" as &dyn PDASeed].into_iter())
