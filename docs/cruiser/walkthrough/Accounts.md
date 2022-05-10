@@ -285,7 +285,7 @@ Next we'll build the player profile. This is for storing a player's stats includ
 use cruiser::prelude::*;
 
 /// A player's profile.
-#[derive(Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Debug, BorshDeserialize, BorshSerialize, PartialEq)]
 pub struct PlayerProfile {
     /// The key allowed to act for this profile.
     pub authority: Pubkey,
@@ -302,8 +302,7 @@ pub struct PlayerProfile {
     /// The amount of lamports this player has lost.
     pub lamports_lost: u64,
     /// The elo rating of the player.
-    /// Note: floats will be truncated to integers by borsh, we are using one here because it saves us some casting.
-    pub elo: f64,
+    pub elo: u64,
 }
 impl OnChainSize for PlayerProfile {
     const ON_CHAIN_SIZE: usize =
@@ -311,7 +310,7 @@ impl OnChainSize for PlayerProfile {
 }
 impl PlayerProfile {
     /// The initial elo for a new profile.
-    pub const INITIAL_ELO: f64 = 1200.0;
+    pub const INITIAL_ELO: u64 = 1200;
 
     /// Creates a new player profile.
     /// `authority` is a ref to a pubkey because it's more efficient to use a ref on-chain.
@@ -335,17 +334,22 @@ fn win_probability(elo_a: f64, elo_b: f64) -> f64 {
 }
 
 /// Calculates the new elo of players after a game.
-pub fn update_elo(elo_a: &mut f64, elo_b: &mut f64, k: f64, a_won: bool) {
-    let a_prob = win_probability(*elo_a, *elo_b);
-    let b_prob = win_probability(*elo_b, *elo_a);
+pub fn update_elo(elo_a: &mut u64, elo_b: &mut u64, k: f64, a_won: bool) {
+    let mut elo_a_float = *elo_a as f64;
+    let mut elo_b_float = *elo_b as f64;
+    let a_prob = win_probability(elo_a_float, elo_b_float);
+    let b_prob = win_probability(elo_b_float, elo_a_float);
 
     if a_won {
-        *elo_a += k * (1.0 - a_prob);
-        *elo_b += k * (0.0 - b_prob);
+        elo_a_float += k * (1.0 - a_prob);
+        elo_b_float += k * (0.0 - b_prob);
     } else {
-        *elo_a += k * (0.0 - a_prob);
-        *elo_b += k * (1.0 - b_prob);
+        elo_a_float += k * (0.0 - a_prob);
+        elo_b_float += k * (1.0 - b_prob);
     }
+
+    *elo_a = elo_a_float as u64;
+    *elo_b = elo_b_float as u64;
 }
 ```
 

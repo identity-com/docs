@@ -41,6 +41,13 @@ cruiser_tutorial
  | | |- ...
 *| |- lib.rs             // Your program's main file
  | |- pda.rs             // Your program's PDAs
+ |- tests
+ | |- all_tests.rs       // Tests for your program
+ | |- instructions
+ | | |- mod.rs
+ | | |- test_instruction1.rs
+ | | |- test_instruction2.rs
+ | | |- ...
 *|- Cargo.toml
 *|- Cargo.lock
 *|- rust-toolchain.toml
@@ -86,6 +93,12 @@ client = ["cruiser/client", "cpi"]
 [dependencies]
 # This tutorial targets the unrealeased version 0.3.0 of cruiser. This will eventually be released.
 cruiser = { git = "https://github.com/identity-com/cruiser.git", branch = "release/0.3.0" }
+
+[dev-dependencies]
+cruiser = { git = "https://github.com/identity-com/cruiser.git", branch = "release/0.3.0", features = ["client"] }
+reqwest = "0.11.10"
+futures = "0.3.21"
+tokio = { version = "1.17.0", features = ["full"] }
 ```
 
 #### Optional cruiser features
