@@ -1,6 +1,6 @@
 # Sample Escrow Program
 
-In this example of Cruiser's functionality we will walk through an example escrow program.
+In this example of Cruiser's functionality we will walk through an example escrow program. This is a recreation of the [PaulX escrow tutorial](https://paulx.dev/blog/2021/01/14/programming-on-solana-an-introduction/)
 
 All the code for this project can be found here: [Cruiser -> Escrow](https://github.com/identity-com/cruiser/tree/master/escrow_example)
 
@@ -9,26 +9,10 @@ All the code for this project can be found here: [Cruiser -> Escrow](https://git
 Escrow is used in a variety of situations, but most commonly in financial transactions where the two parties performing the transaction want a trusted third party to hold the agreed-upon money until the terms of the transaction are fulfilled. This is to prevent one party from cheating the other out of either money, goods, or services.
 
 ```rust
-// The list of account types the program uses
-use cruiser::account_list::AccountList;
-// Handles Serialization and Deserialization
-use cruiser::borsh::{BorshDeserialize, BorshSerialize};
-// The list of instruction that the program has
-use cruiser::instruction_list::InstructionList;
-// A helper trait that tells you the size of the account data on-chain
-use cruiser::on_chain_size::{OnChainSize, OnChainStaticSize};
-// Handles the type-safe pda seeding
-use cruiser::pda_seeds::{PDASeed, PDASeeder};
-use cruiser::{borsh, Pubkey};
-```
+// This is the list of escrow instructions
 
-```rust
 #[derive(InstructionList, Copy, Clone)]
 #[instruction_list(account_list = EscrowAccounts, account_info = [<'a, AI> AI where AI: cruiser::ToSolanaAccountInfo<'a>])]
-```
-
-```rust
-// This is the list of escrow instructions
 
 pub enum EscrowInstructions {
     #[instruction(instruction_type = instructions::init_escrow::InitEscrow)]
@@ -41,16 +25,16 @@ pub enum EscrowInstructions {
 ```rust
 // The list of escrow accounts
 
-#[derive(AccountList)] // Runs implements standard arguments for AccountList (from Cruiser) 
+#[derive(AccountList)]
 pub enum EscrowAccounts {
     EscrowAccount(EscrowAccount),
 }
 ```
 
 ```rust
-// This is the format of an escrow account
+// This is what an escrow account looks like using standard Borsh serialization
 
-#[derive(BorshSerialize, BorshDeserialize, Default)] // BorshSerialize and BorshDeserialize are from Cruiser and handle serialization and deserialization of data for you
+#[derive(BorshSerialize, BorshDeserialize, Default)]
 pub struct EscrowAccount {
     pub initializer: Pubkey,
     pub temp_token_account: Pubkey,
@@ -60,7 +44,7 @@ pub struct EscrowAccount {
 ```
 
 ```rust
-// Implementing OnChainSize for EscrowAccount
+// A helpful trait that keeps track of account size on chain
 
 impl OnChainSize<()> for EscrowAccount {
     fn on_chain_max_size(_arg: ()) -> usize {
@@ -70,7 +54,7 @@ impl OnChainSize<()> for EscrowAccount {
 ```
 
 ```rust
-// Implementing the PDASeeder for EscrowPDASeeder
+// This is type-safe PDA seeding that prevents you from mixing up seeds
 
 #[derive(Debug)]
 struct EscrowPDASeeder;
