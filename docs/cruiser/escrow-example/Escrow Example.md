@@ -1,12 +1,12 @@
 # Sample Escrow Program
 
-In this example of Cruiser's functionality we will walk through an example escrow program. This is a recreation of the [PaulX escrow tutorial](https://paulx.dev/blog/2021/01/14/programming-on-solana-an-introduction/)
-
-All the code for this project can be found here: [Cruiser -> Escrow](https://github.com/identity-com/cruiser/tree/master/escrow_example)
+In this example of Cruiser's functionality we will walk through an example escrow program. This is a recreation of the [PaulX escrow tutorial](https://paulx.dev/blog/2021/01/14/programming-on-solana-an-introduction/) and all the code for this project can be found here: [Cruiser -> Escrow](https://github.com/identity-com/cruiser/tree/master/escrow_example)
 
 ## What is an Escrow program?
 
 Escrow is used in a variety of situations, but most commonly in financial transactions where the two parties performing the transaction want a trusted third party to hold the agreed-upon money until the terms of the transaction are fulfilled. This is to prevent one party from cheating the other out of either money, goods, or services.
+
+Let's look at an example of this put together with the Cruiser framework.
 
 ```rust
 // This is the list of escrow instructions
