@@ -1,10 +1,12 @@
-# Cruiser Escrow Demo
+# Cruiser
 
 ```ts
 const intro: string = "THIS FILE WILL SERVE AS INTRODUCTION"
 
 console.log(`${intro.toLowerCase()}`)
 ```
+
+## If you just want an example of Cruiser in action, check out the escrow example. Visit the walkthrough for a more in-depth tutorial.
 
 - Cruiser Intro
 - Solana basics (you need to know x, y, z)
