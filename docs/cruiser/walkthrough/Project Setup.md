@@ -135,6 +135,27 @@ pub enum TutorialInstructions {}
 pub enum TutorialAccounts {}
 ```
 
+## Suggested Lints
+
+These are lints that are suggested to be added at the top of `src/lib.rs`. They are not required, but help make readable and better code.
+
+```rust
+#![warn(
+    unused_import_braces,           // This will be caught by rustfmt as well
+
+    missing_docs,                   // Ensures all public items are documented
+
+    missing_debug_implementations,  // Makes sure all public items have a debug implementation
+
+    unused_qualifications,          // This cleans up your code when there are unnecessary qualifiers
+
+    clippy::pedantic                // This can be aggressive but catches a lot of common mistakes. 
+                                    // A bunch don't matter or aren't applicable so can be disabled 
+                                    // either on a case-by-case basis or by disabling the lint with 
+                                    // an allow
+)]
+```
+
 ## Next Steps
 
 Next up we'll set up an account for the program to use.

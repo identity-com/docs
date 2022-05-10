@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 # Instructions
 
 After designing how the data looks in our program we can spec out our instructions. We'll need _ instructions to do what we want to do, outlined here:
@@ -95,7 +91,15 @@ pub trait Instruction<AI>: Sized {
 
 This is usually implemented for unit structs (ie `struct Foo;`).
 
-`Data` is the simplest, it's any type that implements `BorshDeserialize` and is the data that comes in from the instruction data of the transaction. `ReturnType` is a little more complex by also requiring `BorshSerialize`. It's the returned data to the caller in the case of CPI. The data serialization and deserialization is handled by cruiser internally. `Accounts` is the most complicated.
+### Data
+
+`Data` is the simplest, it's any type that implements `BorshDeserialize` and is the data that comes in from the instruction data of the transaction. 
+
+### Return Type
+
+`ReturnType` is a little more complex than `Data` by also requiring `BorshSerialize`. It's the returned data to the caller in the case of CPI. The data serialization and deserialization is handled by cruiser internally. `Accounts` is the most complicated.
+
+### Accounts
 
 `Accounts` requirement is the implementation of `AccountArgument`, `FromAccounts`, and `ValidateArgument`. The flow is as follows:
 
@@ -324,3 +328,7 @@ pub struct MyArgumentComplex<AI> {
     rest_of_accounts: Rest<AI>,
 }
 ```
+
+## Next Steps
+
+Next we will create each instruction and explain further principles with each.

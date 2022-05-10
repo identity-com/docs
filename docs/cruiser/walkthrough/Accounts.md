@@ -309,6 +309,25 @@ impl OnChainSize for PlayerProfile {
     const ON_CHAIN_SIZE: usize =
         Pubkey::ON_CHAIN_SIZE + u64::ON_CHAIN_SIZE * 6 + f64::ON_CHAIN_SIZE;
 }
+impl PlayerProfile {
+    /// The initial elo for a new profile.
+    pub const INITIAL_ELO: f64 = 1200.0;
+
+    /// Creates a new player profile.
+    /// `authority` is a ref to a pubkey because it's more efficient to use a ref on-chain.
+    pub fn new(authority: &Pubkey) -> Self {
+        Self {
+            authority: *authority,
+            wins: 0,
+            loses: 0,
+            draws: 0,
+            forfeits: 0,
+            lamports_won: 0,
+            lamports_lost: 0,
+            elo: Self::INITIAL_ELO,
+        }
+    }
+}
 
 /// Probability of `elo_a` winning over `elo_b`.
 fn win_probability(elo_a: f64, elo_b: f64) -> f64 {
