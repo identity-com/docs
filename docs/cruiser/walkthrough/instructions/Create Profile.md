@@ -235,12 +235,12 @@ Now we can also talk about instruction discriminants. By default `cruiser` instr
 #[instruction_list(
     account_list = TutorialAccounts,
     account_info = [<'a, AI> AI where AI: ToSolanaAccountInfo<'a>],
-    discriminant_type = u8,
+    discriminant_type = u8, // <- Set the discriminant type to u8
 )]
 pub enum TutorialInstructions {
     /// Creates a new player profile.
     #[instruction(instruction_type = instructions::CreateProfile)]
-    CreateProfile = 100,
+    CreateProfile = 100, // <- Set the discriminant to 100
 }
 ```
 
@@ -398,9 +398,9 @@ required-features = ["client"]
 
 This makes sure our tests only run with the client feature enabled.
 
-### `tests/instruction/mod.rs`
+### `tests/instructions/mod.rs`
 
-Next we'll add the `tests` directory in with its module at `tests/instruction/mod.rs`:
+Next we'll add the `tests` directory in with its module at `tests/instructions/mod.rs`:
 
 ```rust
 mod create_profile;
