@@ -70,7 +70,7 @@ The `Cargo.toml` file will add features and the `cruiser` dependency.
 
 ```toml
 [package]
-name = "tutorial_program"
+name = "cruiser_tutorial"
 version = "0.0.0"
 edition = "2021"
 
@@ -135,6 +135,8 @@ entrypoint_list!(TutorialInstructions, TutorialInstructions);
 #[instruction_list(
     account_list = TutorialAccounts,
     account_info = [<'a, AI> AI where AI: ToSolanaAccountInfo<'a>],
+    // This sets the discriminant for the instruction list. By default it is `u64`.
+    discriminant_type = u8,
 )]
 pub enum TutorialInstructions {}
 

@@ -38,7 +38,7 @@ Next we'll add in the game board account. This isn't the most efficient way to s
 use cruiser::prelude::*;
 
 /// The game board.
-#[derive(Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq, OnChainSize)]
 pub struct GameBoard {
     /// The version of this account. Should always add this for future proofing.
     /// Should be 0 until a new version is added.
@@ -47,40 +47,66 @@ pub struct GameBoard {
     pub player1: Pubkey,
     /// The second player's profile.
     pub player2: Pubkey,
+    /// Which player was the creator and entitled to the rent.
+    pub creator: Player,
     /// The player to take the next move.
     pub next_play: Player,
     /// The bump of the signer that holds the wager.
     pub signer_bump: u8,
     /// The wager per player in lamports.
     pub wager: u64,
+    /// The amount of time in seconds to play a given turn before forfeiting.
+    pub turn_length: UnixTimestamp,
+    /// The last turn timestamp.
+    pub last_turn: UnixTimestamp,
     /// The current board. In RC format.
     pub board: Board<Board<Space>>,
 }
-// This helps us tell the size of the struct in bytes.
-// Eventually this will be derivable.
-impl OnChainSize for GameBoard {
-    const ON_CHAIN_SIZE: usize = u8::ON_CHAIN_SIZE
-        + Pubkey::ON_CHAIN_SIZE * 2
-        + Player::ON_CHAIN_SIZE
-        + u8::ON_CHAIN_SIZE
-        + u64::ON_CHAIN_SIZE
-        + Board::<Board<Space>>::ON_CHAIN_SIZE;
+
+impl GameBoard {
+    /// Creates a new game board.
+    pub fn new(
+        player_profile: &Pubkey,
+        player: Player,
+        signer_bump: u8,
+        wager: u64,
+        turn_length: UnixTimestamp,
+    ) -> Self {
+        Self {
+            version: 0,
+
+            player1: if player == Player::One {
+                *player_profile
+            } else {
+                Pubkey::new_from_array([0; 32])
+            },
+            player2: if player == Player::Two {
+                *player_profile
+            } else {
+                Pubkey::new_from_array([0; 32])
+            },
+            creator: player,
+            next_play: Player::One,
+            signer_bump,
+            wager,
+            turn_length,
+            last_turn: 0,
+            board: Default::default(),
+        }
+    }
 }
 
 /// A player
-#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq, OnChainSize)]
 pub enum Player {
     /// Player 1
     One,
     /// Player 2
     Two,
 }
-impl OnChainSize for Player {
-    const ON_CHAIN_SIZE: usize = 1;
-}
 
 /// A space on the game board.
-#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq, OnChainSize)]
 pub enum Space {
     /// Player 1's space
     PlayerOne,
@@ -88,10 +114,6 @@ pub enum Space {
     PlayerTwo,
     /// Empty space
     Empty,
-}
-impl OnChainSize for Space {
-    // The size of an enum in borsh is its discriminant which is a u8.
-    const ON_CHAIN_SIZE: usize = 1;
 }
 impl From<Player> for Space {
     fn from(player: Player) -> Self {
@@ -108,18 +130,13 @@ impl Default for Space {
 }
 
 /// A sub-board. We use a generic for if we want to go crazy and add sub-sub boards!
-#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq, OnChainSize)]
+#[on_chain_size(generics = [where S: OnChainSize])]
 pub enum Board<S> {
     /// Board has no winner yet. Board is in RC format.
     Unsolved([[S; 3]; 3]),
     /// Board has a winner
     Solved(Player),
-}
-impl<S> OnChainSize for Board<S>
-    where
-        S: OnChainSize,
-{
-    const ON_CHAIN_SIZE: usize = 1 + S::ON_CHAIN_SIZE * 3 * 3;
 }
 impl<S> Default for Board<S>
     where
@@ -179,7 +196,7 @@ impl<S> CurrentWinner for Board<S>
                 // We make a move on the sub board.
                 sub_board[index[0] as usize][index[1] as usize].make_move(player, sub_index)?;
                 // Now we check if we are solved.
-                if get_winner(sub_board, player) {
+                if is_winner(sub_board, player) {
                     *self = Board::Solved(player);
                 }
                 Ok(())
@@ -198,7 +215,7 @@ impl<S> CurrentWinner for Board<S>
 }
 
 /// Gets the winner of a board. This could be a sub-board or the main board.
-pub fn get_winner(board: &[[impl CurrentWinner + Copy; 3]; 3], last_turn: Player) -> bool {
+pub fn is_winner(board: &[[impl CurrentWinner + Copy; 3]; 3], last_turn: Player) -> bool {
     // Check rows
     if board.iter().any(|row| {
         row.iter()
@@ -251,26 +268,26 @@ mod test {
             [Space::Empty, Space::PlayerTwo, Space::PlayerTwo],
             [Space::Empty, Space::Empty, Space::Empty],
         ];
-        assert!(get_winner(&board, Player::One));
+        assert!(is_winner(&board, Player::One));
         let board = [
             [Space::PlayerTwo, Space::PlayerOne, Space::PlayerOne],
             [Space::Empty, Space::PlayerTwo, Space::PlayerTwo],
             [Space::Empty, Space::Empty, Space::PlayerTwo],
         ];
-        assert!(get_winner(&board, Player::Two));
+        assert!(is_winner(&board, Player::Two));
         let board = [
             [Space::PlayerTwo, Space::PlayerOne, Space::PlayerOne],
             [Space::Empty, Space::PlayerTwo, Space::PlayerOne],
             [Space::Empty, Space::Empty, Space::PlayerOne],
         ];
-        assert!(get_winner(&board, Player::One));
+        assert!(is_winner(&board, Player::One));
         let board = [
             [Space::PlayerTwo, Space::PlayerOne, Space::PlayerOne],
             [Space::Empty, Space::PlayerTwo, Space::Empty],
             [Space::Empty, Space::Empty, Space::PlayerOne],
         ];
-        assert!(!get_winner(&board, Player::One));
-        assert!(!get_winner(&board, Player::Two));
+        assert!(!is_winner(&board, Player::One));
+        assert!(!is_winner(&board, Player::Two));
     }
 }
 ```
@@ -285,7 +302,7 @@ Next we'll build the player profile. This is for storing a player's stats includ
 use cruiser::prelude::*;
 
 /// A player's profile.
-#[derive(Debug, BorshDeserialize, BorshSerialize, PartialEq)]
+#[derive(Debug, BorshDeserialize, BorshSerialize, PartialEq, OnChainSize)]
 pub struct PlayerProfile {
     /// The key allowed to act for this profile.
     pub authority: Pubkey,
@@ -303,10 +320,6 @@ pub struct PlayerProfile {
     pub lamports_lost: u64,
     /// The elo rating of the player.
     pub elo: u64,
-}
-impl OnChainSize for PlayerProfile {
-    const ON_CHAIN_SIZE: usize =
-        Pubkey::ON_CHAIN_SIZE + u64::ON_CHAIN_SIZE * 6 + f64::ON_CHAIN_SIZE;
 }
 impl PlayerProfile {
     /// The initial elo for a new profile.
@@ -355,7 +368,7 @@ pub fn update_elo(elo_a: &mut u64, elo_b: &mut u64, k: f64, a_won: bool) {
 
 ## Add to list
 
-Finally we'll add these accounts to our `AccountList`. In `src/lib.rs` we'll update the account list with:
+Finally, we'll add these accounts to our `AccountList`. In `src/lib.rs` we'll update the account list with:
 
 ```rust
 /// This is the list of accounts used by the program.

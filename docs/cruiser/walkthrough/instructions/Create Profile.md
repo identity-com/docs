@@ -35,7 +35,7 @@ pub struct CreateProfileAccounts<AI> {
     #[validate(signer)]
     pub authority: AI,
     /// The new profile to create
-    #[from(data = PlayerProfile::new(authority.key()))] // This is where we set the initial value
+    #[from(data = PlayerProfile::new(authority.key()))] // This is where we set the initial value of the profile
     #[validate(data = InitArgs{
         system_program: &self.system_program,
         space: InitStaticSized,
@@ -66,7 +66,7 @@ Let's break this down.
 pub enum CreateProfile {}
 ```
 
-Here we create a type to represent the instruction. Instructions in cruiser are a bunch of static functions so we use an un-buildable enum. It would also be valid to use any other type as `self` is never referenced for the instruction. Unit structs (`pub struct CreateProfile;`) are also common.
+Here we create a type to represent the instruction. Instructions in cruiser are a bunch of static functions, so we use an un-buildable enum. It would also be valid to use any other type as `self` is never referenced for the instruction. Unit structs (`pub struct CreateProfile;`) are also common.
 
 ```rust
 /// Accounts for [`CreateProfile`]
@@ -76,19 +76,19 @@ Here we create a type to represent the instruction. Instructions in cruiser are 
 pub struct CreateProfileAccounts<AI> {
 ```
 
-Here we see a usage of generics in our validation logic. The `ToSolanaAccountInfo` trait is used to convert an account info into the solana version for CPI calling. We don't need it for the rest of the instruction so we minimize our requirements by putting it in the `validate` attribute. It would also be valid to put it on the `account_argument` attribute because it's a parent to `validate` but would bubble up to other places.
+Here we see a usage of generics in our validation logic. The `ToSolanaAccountInfo` trait is used to convert an account info into the solana version for CPI calling. We don't need it for the rest of the instruction, so we minimize our requirements by putting it in the `validate` attribute. It would also be valid to put it on the `account_argument` attribute because it's a parent to `validate` but would bubble up to other places.
 
 ```rust
 /// The authority for the new profile.
 #[validate(signer)]
-authority: AI,
+pub authority: AI,
 ```
 
 We require the authority for the profile to sign the creation.
 
 ```rust
 /// The new profile to create
-#[from(data = PlayerProfile::new(authority.key()))] // This is where we set the initial value
+#[from(data = PlayerProfile::new(authority.key()))] // This is where we set the initial value of the profile
 #[validate(data = InitArgs{
     system_program: &self.system_program,
     space: InitStaticSized,
@@ -105,7 +105,7 @@ Here is most of the logic for this instruction. The first thing to look at is th
 
 Next we look at the `from` attribute. Here we see that the data is the initial data for the new account. `FromAccounts<()>` is also implemented for this type where the data has a `Default` implementation.
 
-Then we look at the `validate` attribute. Here we see that the data used is a struct called `InitArgs`. In reallity there are many generics on this struct but those are hidden because of struct initialization. Here are the values:
+Then we look at the `validate` attribute. Here we see that the data used is a struct called `InitArgs`. In reality there are many generics on this struct but those are hidden because of struct initialization. Here are the values:
 
 | field            | type                                                 | description                                                                                        |
 |------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------|
@@ -125,7 +125,7 @@ The `CPIMethod` allows you to pick whether to do checked CPI or unchecked CPI. U
 pub funder: AI,
 ```
 
-This is the funder, the `signer` and `writable` checks are technically redundant because they are checked by the CPI call but they help latter us know what the requirements are.
+This is the funder. The `signer` and `writable` checks are technically redundant because they are checked by the CPI call, but they help latter us know what the requirements are.
 
 ```rust
 /// The system program. Needed if the account is not zeroed.
@@ -140,7 +140,7 @@ This is the system program that we will CPI into. The `SystemProgram` type makes
 pub struct CreateProfileData {}
 ```
 
-Finally, we have the data. in this case we don't need any so we use an empty struct. It would be just as valid to use the unit type `()` as the data type instead.
+Finally, we have the data. In this case we don't need any, so we use an empty struct. It would be just as valid to use the unit type `()` as the data type instead.
 
 ## Processor
 
@@ -183,7 +183,7 @@ mod processor {
 }
 ```
 
-Most of this is explained in comments so we will only go over the trait itself.
+Most of this is explained in comments, so we will only go over the trait itself.
 
 ```rust
 impl<'a, AI> InstructionProcessor<AI, CreateProfile> for CreateProfile
@@ -203,13 +203,14 @@ fn data_to_instruction_arg(
     Self::ValidateData,
     Self::InstructionData,
 )> {
+    // This converts the data into the 3 types that are needed for the instruction.
     Ok(((), (), ()))
 }
 ```
 
 This is where we split the instruction data that comes in. `FromAccountsData` is passed to the `FromAccounts` implementation, `ValidateData` is passed to the `ValidateArgument` implementation, and `InstructionData` is passed to the `process` function. Since we don't have any data theses are all `()`.
 
-## Add to InstuctiionList
+## Add to InstructionList
 
 Next we need to register our instruction with our instruction list. To do this we'll add the following to the list in `src/lib.rs`:
 
@@ -218,6 +219,7 @@ Next we need to register our instruction with our instruction list. To do this w
 #[instruction_list(
     account_list = TutorialAccounts,
     account_info = [<'a, AI> AI where AI: ToSolanaAccountInfo<'a>],
+    discriminant_type = u8,
 )]
 pub enum TutorialInstructions {
     /// Creates a new player profile.
@@ -226,7 +228,7 @@ pub enum TutorialInstructions {
 }
 ```
 
-Now we can also talk about instruction discriminants. By default `cruiser` instructions are discriminated by a `u64` corresponding to the enum variant. If you want a different discriminant type you can add the `discriminant_type` argument to the `instruction_list` attribute. The type must implement `CompressedNumber<u64>` (`u8`, `u16`, and `u32` are all valid, but you can make your own if you want to do it differently). In addition, if you want the value to be different than the default discriminant you can change it with the standard rust discriminant syntax.
+Now we can also talk about instruction discriminants. By default `cruiser` instructions are discriminated by a `u64` corresponding to the enum variant. If you want a different discriminant type you can add the `discriminant_type` argument to the `instruction_list` attribute. The type must implement `CompressedNumber<u64>` (`u8`, `u16`, and `u32` are all valid, but you can make your own if you want to do it differently). In addition, if you want the value to be different from the default discriminant you can change it with the standard rust discriminant syntax.
 
 ```rust
 #[derive(Debug, InstructionList, Copy, Clone)]
@@ -247,6 +249,8 @@ pub enum TutorialInstructions {
 Next we'll add functions to help with CPI calls to this instruction. Even if your function isn't designed with CPI in mind it's helpful to have this as it makes client code easier. We'll add the following to the instruction file:
 
 ```rust
+#[cfg(feature = "cpi")]
+pub use cpi::*;
 /// CPI types for [`CreateProfile`]
 #[cfg(feature = "cpi")] // We don't need this code when compiling our program for deployment
 pub mod cpi {
@@ -261,7 +265,7 @@ pub mod cpi {
         // The `MaybeOwned` type allows for refs or owned values to be passed in.
         accounts: [MaybeOwned<'a, AI>; 4],
         // The data has to be `Vec`ed anyway for CPI so we do that here.
-        data: Vec<u8>, 
+        data: Vec<u8>,
     }
     impl<'a, AI> CreateProfileCPI<'a, AI> {
         /// Creates a new player profile.
@@ -277,7 +281,7 @@ pub mod cpi {
             <TutorialInstructions as InstructionListItem<CreateProfile>>::discriminant_compressed()
                 .serialize(&mut data)?;
             // This will do nothing but throw an error if we update this to include more data.
-            CreateProfileData {}.serialize(&mut data)?; 
+            CreateProfileData {}.serialize(&mut data)?;
             Ok(Self {
                 accounts: [
                     authority.into(),
@@ -325,7 +329,7 @@ pub mod cpi {
                     accounts.next().unwrap(),
                     accounts.next().unwrap(),
                     accounts.next().unwrap(),
-                    program_account.into(),
+                    program_account,
                 ],
             }
         }
@@ -338,9 +342,11 @@ pub mod cpi {
 Now we're going to add the client functions to the instruction. These are meant to be called by a rust client through RPC calls in either tests, stand-alone applications, or WASM in a website. We add the following to the bottom of the instruction file: 
 
 ```rust
+#[cfg(feature = "client")]
+pub use client::*;
 /// Client functions for [`CreateProfile`]
-#[cfg(feature = "client")] // We don't want any of the client code in program code.
-pub mod client {
+#[cfg(feature = "client")]
+mod client {
     use super::*;
 
     /// Creates a new player profile.
@@ -394,18 +400,17 @@ This makes sure our tests only run with the client feature enabled.
 
 ### `tests/instruction/mod.rs`
 
-Next we'll add the tests directory in with its module at `tests/instruction/mod.rs`:
+Next we'll add the `tests` directory in with its module at `tests/instruction/mod.rs`:
 
 ```rust
 mod create_profile;
 ```
 
-The reason we have to have them in a folder is because rust runs all top level test files sequentially but we want to run a single local validator for all of our tests.
+The reason we have to have them in a folder is because rust runs all top level test files sequentially, but we want to run a single local validator for all of our tests.
 
 To this file we'll add some helpful validator setup code:
 
 ```rust
-
 use cruiser::prelude::*;
 use futures::executor::block_on;
 use reqwest::Client;
@@ -531,19 +536,21 @@ async fn start_validator() -> Result<(Pubkey, Child), Box<dyn std::error::Error>
         .arg("--ledger")
         .arg(Path::new(env!("CARGO_TARGET_TMPDIR")).join("test_ledger"));
 
+    println!("Starting local validator...");
+    println!("{:?}", local_validator);
     Ok((program_id, local_validator.spawn()?))
 }
 
 #[must_use]
 pub struct TestGuard {
     setup: &'static Setup,
-    client: RpcClient,
+    rpc: RpcClient,
 }
 impl TestGuard {
     fn new(setup: &'static Setup) -> Self {
         Self {
             setup,
-            client: RpcClient::new("https://localhost:8899"),
+            rpc: RpcClient::new("http://localhost:8899".to_string()),
         }
     }
 
@@ -551,8 +558,8 @@ impl TestGuard {
         unsafe { (*self.setup.program_id.get()).unwrap() }
     }
 
-    pub fn client(&self) -> &RpcClient {
-        &self.client
+    pub fn rpc(&self) -> &RpcClient {
+        &self.rpc
     }
 
     pub async fn drop_self(self) {
@@ -598,7 +605,7 @@ impl Drop for TestGuard {
 }
 ```
 
-This is some code that will setup the local validator for all the tests. Notice the comment on `setup_validator`.
+This is some code that will set up the local validator for all the tests. Notice the comment on `setup_validator`.
 
 ### `tests/instructions/create_profile.rs`
 
@@ -610,7 +617,7 @@ use cruiser::prelude::*;
 use std::error::Error;
 use std::time::Duration;
 use tutorial_program::accounts::PlayerProfile;
-use tutorial_program::instructions::client::create_profile;
+use tutorial_program::instructions::create_profile;
 use tutorial_program::TutorialAccounts;
 
 #[tokio::test]
@@ -700,3 +707,5 @@ async fn create_profile_test() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 ```
+
+This test should execute without error. To run it you can either run `cargo test --features client` or `cargo test --features client --test all_tests instructions::create_profile::create_profile_test -- --exact` to run only this test.
