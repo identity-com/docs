@@ -614,11 +614,11 @@ Now we can create our actual test file:
 ```rust
 use crate::instructions::setup_validator;
 use cruiser::prelude::*;
+use cruiser_tutorial::accounts::PlayerProfile;
+use cruiser_tutorial::instructions::create_profile;
+use cruiser_tutorial::TutorialAccounts;
 use std::error::Error;
 use std::time::Duration;
-use tutorial_program::accounts::PlayerProfile;
-use tutorial_program::instructions::create_profile;
-use tutorial_program::TutorialAccounts;
 
 #[tokio::test]
 async fn create_profile_test() -> Result<(), Box<dyn Error>> {
