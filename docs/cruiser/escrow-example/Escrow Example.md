@@ -81,6 +81,8 @@ pub enum EscrowInstruction {
 }
 ```
 
+### The following is the vanilla way of implementing the Escrow Instruction, as opposed to using Cruiser, where you can just bring the instruction into scope
+
 ```rust
 impl EscrowInstruction {
     /// Unpacks a byte buffer into a [EscrowInstruction](enum.EscrowInstruction.html).
@@ -109,7 +111,7 @@ impl EscrowInstruction {
 }
 ```
 
-**That was a lot in comparison, but we're just getting started... Let's next take a look at the code required with vanilla Solana to tell what an Escrow account is.**
+### That was a lot in comparison, but we're just getting started... Let's next take a look at the code required with vanilla Solana to tell what an Escrow account is
 
 ```rust
 pub struct Escrow {
@@ -184,7 +186,20 @@ impl Pack for Escrow {
 }
 ```
 
-**And finally, let's see what it takes to implement the actual instructions for how an escrow transaction works.**
+### And finally, let's see what it takes to implement the actual instructions for how an escrow transaction works
+
+In Cruiser, the way to do this is as follows.
+
+```rust
+pub enum EscrowInstructions {
+    #[instruction(instruction_type = instructions::init_escrow::InitEscrow)]
+    InitEscrow,
+    #[instruction(instruction_type = instructions::exchange::Exchange)]
+    Exchange,
+}
+```
+
+### The following, however, is the vanilla method to implement the escrow initialization and exchange instructions
 
 ```rust
 pub struct Processor;
@@ -391,6 +406,6 @@ impl Processor {
 }
 ```
 
-**Phew! You can see how much easier things are with Cruiser...**
+### Phew! You can see how much easier things are with Cruiser
 
 If you'd like to use Cruiser in your next Solana project, please check it out on [Crates.io](https://crates.io/crates/cruiser)
