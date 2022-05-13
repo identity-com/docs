@@ -364,7 +364,7 @@ mod client {
         InstructionSet {
             instructions: vec![
                 // We use the cpi function to reduce the amount of code we need to write.
-                cpi::CreateProfileCPI::new(
+                CreateProfileCPI::new(
                     SolanaAccountMeta::new_readonly(authority.pubkey(), true),
                     SolanaAccountMeta::new(profile.pubkey(), true),
                     SolanaAccountMeta::new(funder.pubkey(), true),

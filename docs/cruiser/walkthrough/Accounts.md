@@ -22,10 +22,10 @@ pub mod accounts;
 ```rust
 //! Accounts for the program.
 
-mod game_board;
+mod game;
 mod player_profile;
 
-pub use game_board::*;
+pub use game::*;
 pub use player_profile::*;
 ```
 
@@ -33,13 +33,13 @@ pub use player_profile::*;
 
 Next we'll add in the game board account. This isn't the most efficient way to store the data, but it's a good starting point.
 
-### `src/accounts/game_board.rs`
+### `src/accounts/game.rs`
 ```rust
 use cruiser::prelude::*;
 
 /// The game board.
 #[derive(Debug, BorshDeserialize, BorshSerialize, Eq, PartialEq, OnChainSize)]
-pub struct GameBoard {
+pub struct Game {
     /// The version of this account. Should always add this for future proofing.
     /// Should be 0 until a new version is added.
     pub version: u8,
@@ -57,13 +57,15 @@ pub struct GameBoard {
     pub wager: u64,
     /// The amount of time in seconds to play a given turn before forfeiting.
     pub turn_length: UnixTimestamp,
-    /// The last turn timestamp.
+    /// The last turn timestamp. If 0 game is not started.
     pub last_turn: UnixTimestamp,
+    /// The last move a player did. If `[3,3]` last move is game start.
+    pub last_move: [u8; 2],
     /// The current board. In RC format.
     pub board: Board<Board<Space>>,
 }
 
-impl GameBoard {
+impl Game {
     /// Creates a new game board.
     pub fn new(
         player_profile: &Pubkey,
@@ -91,7 +93,21 @@ impl GameBoard {
             wager,
             turn_length,
             last_turn: 0,
+            last_move: [3, 3],
             board: Default::default(),
+        }
+    }
+
+    /// Tells whether the game has started.
+    pub fn is_started(&self) -> bool {
+        self.last_turn > 0
+    }
+
+    /// Tells whether the other player is valid to join the game.
+    pub fn is_valid_other_player(&self, other_player: &Pubkey) -> bool {
+        match self.creator {
+            Player::One => self.player2 == *other_player || self.player2 == Pubkey::new_from_array([0; 32]),
+            Player::Two => self.player1 == *other_player || self.player1 == Pubkey::new_from_array([0; 32]),
         }
     }
 }
@@ -380,7 +396,7 @@ Finally, we'll add these accounts to our `AccountList`. In `src/lib.rs` we'll up
 #[derive(Debug, AccountList)]
 pub enum TutorialAccounts {
     /// A game board
-    GameBoard(GameBoard),
+    Game(Game),
     /// A player's profile
     PlayerProfile(PlayerProfile),
 }

@@ -20,7 +20,7 @@ Lets define our instruction.
 ```rust
 use crate::accounts::Player;
 use crate::pda::GameSignerSeeder;
-use crate::{GameBoard, PlayerProfile, TutorialAccounts};
+use crate::{Game, PlayerProfile, TutorialAccounts};
 use cruiser::prelude::*;
 
 /// Creates a new game.
@@ -36,7 +36,11 @@ impl<AI> Instruction<AI> for CreateGame {
 /// Accounts for [`CreateGame`]
 #[derive(AccountArgument, Debug)]
 #[account_argument(account_info = AI, generics = [where AI: AccountInfo])]
-#[from(data = (create_data: CreateGameData))]
+#[from(
+    data = (create_data: CreateGameData),
+    custom = create_data.wager.checked_mul(2).is_some(),
+    custom = create_data.turn_length > 0,
+)]
 #[validate(generics = [<'a> where AI: ToSolanaAccountInfo<'a>])]
 pub struct CreateGameAccounts<AI> {
     /// The authority for the creator's profile.
@@ -46,7 +50,7 @@ pub struct CreateGameAccounts<AI> {
     #[validate(custom = &self.player_profile.authority == self.authority.key())]
     pub player_profile: ReadOnlyDataAccount<AI, TutorialAccounts, PlayerProfile>,
     /// The game to be created.
-    #[from(data = GameBoard::new(
+    #[from(data = Game::new(
         player_profile.info().key(), 
         create_data.creator_player, 
         create_data.signer_bump, 
@@ -62,7 +66,7 @@ pub struct CreateGameAccounts<AI> {
         rent: None,
         cpi: CPIChecked,
     })]
-    pub game: InitOrZeroedAccount<AI, TutorialAccounts, GameBoard>,
+    pub game: InitOrZeroedAccount<AI, TutorialAccounts, Game>,
     /// The game signer that will hold the wager.
     #[validate(writable, data = (GameSignerSeeder{ game: *self.game.info().key() }, self.game.signer_bump))]
     pub game_signer: Seeds<AI, GameSignerSeeder>,
@@ -117,16 +121,17 @@ Next we'll look at the new initializer type:
 #[from(
     data = (create_data: CreateGameData),                   // <-- Difference
     custom = create_data.wager.checked_mul(2).is_some(),    // <-- Difference
+    custom = create_data.turn_length > 0,                   // <-- Difference
 )] 
 #[validate(generics = [<'a> where AI: ToSolanaAccountInfo<'a>])]
 pub struct CreateGameAccounts<AI> {
 ```
 
-Here we come to our first major difference. We are adding `from` data to this struct and using a custom validation on it. This will help us initialize the game here:
+Here we come to our first major difference. We are adding `from` data to this struct and using custom validations on it. This will help us initialize the game here:
 
 ```rust 
 /// The game to be created.
-#[from(data = GameBoard::new(
+#[from(data = Game::new(
     player_profile.info().key(), 
     create_data.creator_player, 
     create_data.signer_bump, 
@@ -142,10 +147,10 @@ Here we come to our first major difference. We are adding `from` data to this st
     rent: None,
     cpi: CPIChecked,
 })]
-pub game: InitOrZeroedAccount<AI, TutorialAccounts, GameBoard>,
+pub game: InitOrZeroedAccount<AI, TutorialAccounts, Game>,
 ```
 
-We see that the `from` data is used to build the starting value for the `GameBoard`. We can also see the `InitOrZeroedAccount` type is very similar to `InitAccount` with a few key differences. The `InitOrZeroedAccount` type is actually an enum of `InitAccount` and another type: `ZeroedAccount`. It is determined at runtime which to use based on the account's owner. `ZeroedAccount` does not need initialize arguments so to bring the most compatibility `InitOrZeroedAccount` uses the same `InitArgs` validate argument but with each non-trivial field optional. **Be aware the zeroed path does not guarantee the account size out of the box!** In our case the size just needs to be big enough and writing will fail if it's not. This all means that we can take the account funder optionally: 
+We see that the `from` data is used to build the starting value for the `Game`. We can also see the `InitOrZeroedAccount` type is very similar to `InitAccount` with a few key differences. The `InitOrZeroedAccount` type is actually an enum of `InitAccount` and another type: `ZeroedAccount`. It is determined at runtime which to use based on the account's owner. `ZeroedAccount` does not need initialize arguments so to bring the most compatibility `InitOrZeroedAccount` uses the same `InitArgs` validate argument but with each non-trivial field optional. **Be aware the zeroed path does not guarantee the account size out of the box!** In our case the size just needs to be big enough and writing will fail if it's not. This all means that we can take the account funder optionally: 
 
 ```rust
 /// The funder for the game's rent. Only needed if not zeroed.
@@ -246,7 +251,7 @@ Data routing is handled in the `data_to_instruction_arg` method. This method tak
 
 In our processing we see how easy CPI calls can be. In this case we just call `transfer` directly on the system program account with the proper arguments. We use `empty` as the seeds because none of the required signers are PDAs. Then we see normal rust code to set the other player's profile if it was passed in.
 
-## Add to InstructionList
+## Add to `InstructionList`
 
 Next we need to register our instruction with our instruction list. To do this we'll add the following to the list in `src/lib.rs`:
 
@@ -659,8 +664,8 @@ mod client {
         let mut out = system_program::create_account(
             funder,
             game,
-            rent(GameBoard::ON_CHAIN_SIZE).await?,
-            GameBoard::ON_CHAIN_SIZE as u64,
+            rent(Game::ON_CHAIN_SIZE).await?,
+            Game::ON_CHAIN_SIZE as u64,
             program_id,
         );
         out.add_set(match other_player_profile {
@@ -718,7 +723,7 @@ Then we'll add the test to `tests/instructions/create_game.rs`. For this tutoria
 ```rust
 use crate::instructions::setup_validator;
 use cruiser::prelude::*;
-use cruiser_tutorial::accounts::{GameBoard, Player};
+use cruiser_tutorial::accounts::{Game, Player};
 use cruiser_tutorial::instructions::{create_game, create_profile, CreateGameClientData};
 use cruiser_tutorial::TutorialAccounts;
 use std::error::Error;
@@ -817,12 +822,12 @@ async fn create_game_test() -> Result<(), Box<dyn Error>> {
         <TutorialAccounts as AccountList>::DiscriminantCompressed::deserialize(&mut data)?;
     assert_eq!(
         discriminant,
-        <TutorialAccounts as AccountListItem<GameBoard>>::compressed_discriminant()
+        <TutorialAccounts as AccountListItem<Game>>::compressed_discriminant()
     );
-    let board = GameBoard::deserialize(&mut data)?;
+    let board = Game::deserialize(&mut data)?;
     assert_eq!(
         board,
-        GameBoard::new(
+        Game::new(
             &profile.pubkey(),
             Player::One,
             board.signer_bump,
@@ -836,4 +841,4 @@ async fn create_game_test() -> Result<(), Box<dyn Error>> {
 }
 ```
 
-This test should execute without error. To run it you can either run `cargo test --features client` or `cargo test --features client --test all_tests instructions::create_profile::create_game_test -- --exact` to run only this test.
+This test should execute without error. To run it you can either run `cargo test --features client` or `cargo test --features client --test all_tests instructions::create_game::create_game_test -- --exact` to run only this test.
