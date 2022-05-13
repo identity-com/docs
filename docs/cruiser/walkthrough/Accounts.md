@@ -56,6 +56,7 @@ pub struct Game {
     /// The wager per player in lamports.
     pub wager: u64,
     /// The amount of time in seconds to play a given turn before forfeiting.
+    /// 0 means no time limit.
     pub turn_length: UnixTimestamp,
     /// The last turn timestamp. If 0 game is not started.
     pub last_turn: UnixTimestamp,
@@ -106,8 +107,12 @@ impl Game {
     /// Tells whether the other player is valid to join the game.
     pub fn is_valid_other_player(&self, other_player: &Pubkey) -> bool {
         match self.creator {
-            Player::One => self.player2 == *other_player || self.player2 == Pubkey::new_from_array([0; 32]),
-            Player::Two => self.player1 == *other_player || self.player1 == Pubkey::new_from_array([0; 32]),
+            Player::One => {
+                self.player2 == *other_player || self.player2 == Pubkey::new_from_array([0; 32])
+            }
+            Player::Two => {
+                self.player1 == *other_player || self.player1 == Pubkey::new_from_array([0; 32])
+            }
         }
     }
 }
@@ -325,7 +330,7 @@ pub struct PlayerProfile {
     /// The number of wins this player has.
     pub wins: u64,
     /// The number of losses this player has.
-    pub loses: u64,
+    pub losses: u64,
     /// The number of draws this player has.
     pub draws: u64,
     /// The number of forfeits this player has.
@@ -347,7 +352,7 @@ impl PlayerProfile {
         Self {
             authority: *authority,
             wins: 0,
-            loses: 0,
+            losses: 0,
             draws: 0,
             forfeits: 0,
             lamports_won: 0,
@@ -379,25 +384,5 @@ pub fn update_elo(elo_a: &mut u64, elo_b: &mut u64, k: f64, a_won: bool) {
 
     *elo_a = elo_a_float as u64;
     *elo_b = elo_b_float as u64;
-}
-```
-
-## Add to list
-
-Finally, we'll add these accounts to our `AccountList`. In `src/lib.rs` we'll update the account list with:
-
-```rust
-/// This is the list of accounts used by the program.
-///
-/// The [`AccountList`] trait defines a list of accounts for use by a program.
-/// It is used to make sure no two accounts have the same discriminants.
-/// This derive also implements [`AccountListItem`].
-/// Both these traits can be manually implemented if you need custom logic.
-#[derive(Debug, AccountList)]
-pub enum TutorialAccounts {
-    /// A game board
-    Game(Game),
-    /// A player's profile
-    PlayerProfile(PlayerProfile),
 }
 ```
