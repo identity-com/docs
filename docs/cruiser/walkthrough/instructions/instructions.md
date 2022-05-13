@@ -5,8 +5,8 @@ After designing how the data looks in our program we can spec out our instructio
 - Create Profile: Creates a new player profile.
 - Create Game: Creates a new game.
 - Join Game: Joins a proposed game.
-- Make Move: This will handle winning, losing, and drawing.
 - Forfeit Game: This will handle if your opponent doesn't respond in time.
+- Make Move: This will handle winning, losing, and drawing.
 
 I don't claim this is the best instruction design to use, but it should be enough to get you started.
 
