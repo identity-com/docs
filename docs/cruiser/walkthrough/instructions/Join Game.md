@@ -20,9 +20,9 @@ use cruiser::prelude::*;
 pub enum JoinGame {}
 
 impl<AI> Instruction<AI> for JoinGame {
-type Accounts = JoinGameAccounts<AI>;
-type Data = JoinGameData;
-type ReturnType = ();
+    type Accounts = JoinGameAccounts<AI>;
+    type Data = JoinGameData;
+    type ReturnType = ();
 }
 
 /// Accounts for [`JoinGame`]
@@ -30,27 +30,27 @@ type ReturnType = ();
 #[account_argument(account_info = AI, generics = [where AI: AccountInfo])]
 #[validate(generics = [<'a> where AI: ToSolanaAccountInfo<'a>])]
 pub struct JoinGameAccounts<AI> {
-/// The authority of the joiner
-#[validate(signer)]
-pub authority: AI,
-/// The profile of the joiner
-#[validate(custom = &self.player_profile.authority == self.authority.key())]
-pub player_profile: ReadOnlyDataAccount<AI, TutorialAccounts, PlayerProfile>,
-/// The game to join
-#[validate(
-    writable,
-    custom = !self.game.is_started(),
-    custom = self.game.is_valid_other_player(self.player_profile.info().key()),
-)]
-pub game: DataAccount<AI, TutorialAccounts, Game>,
-/// The signer of the game
-#[validate(writable, data = (GameSignerSeeder{ game: *self.game.info().key() }, self.game.signer_bump))]
-pub game_signer: Seeds<AI, GameSignerSeeder>,
-/// The funder for the wager
-#[validate(signer, writable)]
-pub wager_funder: AI,
-/// The system program
-pub system_program: SystemProgram<AI>,
+    /// The authority of the joiner
+    #[validate(signer)]
+    pub authority: AI,
+    /// The profile of the joiner
+    #[validate(custom = &self.player_profile.authority == self.authority.key())]
+    pub player_profile: ReadOnlyDataAccount<AI, TutorialAccounts, PlayerProfile>,
+    /// The game to join
+    #[validate(
+        writable,
+        custom = !self.game.is_started(),
+        custom = self.game.is_valid_other_player(self.player_profile.info().key()),
+    )]
+    pub game: DataAccount<AI, TutorialAccounts, Game>,
+    /// The signer of the game
+    #[validate(writable, data = (GameSignerSeeder{ game: *self.game.info().key() }, self.game.signer_bump))]
+    pub game_signer: Seeds<AI, GameSignerSeeder>,
+    /// The funder for the wager
+    #[validate(signer, writable)]
+    pub wager_funder: AI,
+    /// The system program
+    pub system_program: SystemProgram<AI>,
 }
 
 /// Data for [`JoinGame`]
