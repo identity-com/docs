@@ -6,7 +6,7 @@ After designing how the data looks in our program we can spec out our instructio
 - Create Game: Creates a new game.
 - Join Game: Joins a proposed game.
 - Forfeit Game: This will handle if your opponent doesn't respond in time.
-- Make Move: This will handle winning, losing, and drawing.
+- Make Move: This will handle making moves and winning.
 
 I don't claim this is the best instruction design to use, but it should be enough to get you started.
 

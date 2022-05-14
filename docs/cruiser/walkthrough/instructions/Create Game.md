@@ -66,7 +66,7 @@ pub struct CreateGameAccounts<AI> {
         rent: None,
         cpi: CPIChecked,
     })]
-    pub game: InitOrZeroedAccount<AI, TutorialAccounts, Game>,
+    pub game: Box<InitOrZeroedAccount<AI, TutorialAccounts, Game>>,
     /// The game signer that will hold the wager.
     #[validate(writable, data = (GameSignerSeeder{ game: *self.game.info().key() }, self.game.signer_bump))]
     pub game_signer: Seeds<AI, GameSignerSeeder>,
@@ -96,7 +96,12 @@ pub struct CreateGameData {
     pub turn_length: UnixTimestamp,
 }
 ```
+
 This instruction is a bit more complicated than the last so let's take it one step at a time, focusing on the differences.
+
+### `Box`
+
+Here is the first time we see an account being boxed. This is needed because Solana has a pretty small stack and if we don't box it (put it on the heap) then we blow the stack. The error that occurs when we try to do this is an `access violation` with some raw pointer addresses. If you see this try to box some of your large accounts or large stack variables.
 
 ### `ReadOnlyDataAccount`
 
@@ -129,7 +134,7 @@ pub struct CreateGameAccounts<AI> {
 
 Here we come to our first major difference. We are adding `from` data to this struct and using custom validations on it. This will help us initialize the game here:
 
-```rust 
+```rust
 /// The game to be created.
 #[from(data = Game::new(
     player_profile.info().key(), 
@@ -147,7 +152,7 @@ Here we come to our first major difference. We are adding `from` data to this st
     rent: None,
     cpi: CPIChecked,
 })]
-pub game: InitOrZeroedAccount<AI, TutorialAccounts, Game>,
+pub game: Box<InitOrZeroedAccount<AI, TutorialAccounts, Game>>,
 ```
 
 We see that the `from` data is used to build the starting value for the `Game`. We can also see the `InitOrZeroedAccount` type is very similar to `InitAccount` with a few key differences. The `InitOrZeroedAccount` type is actually an enum of `InitAccount` and another type: `ZeroedAccount`. It is determined at runtime which to use based on the account's owner. `ZeroedAccount` does not need initialize arguments so to bring the most compatibility `InitOrZeroedAccount` uses the same `InitArgs` validate argument but with each non-trivial field optional. **Be aware the zeroed path does not guarantee the account size out of the box!** In our case the size just needs to be big enough and writing will fail if it's not. This all means that we can take the account funder optionally: 

@@ -56,7 +56,7 @@ pub struct ForfeitGameAccounts<AI> {
             Player::Two => self.other_profile.info().key() == &self.game.player2,
         },
     )]
-    pub game: CloseAccount<AI, DataAccount<AI, TutorialAccounts, Game>>,
+    pub game: Box<CloseAccount<AI, DataAccount<AI, TutorialAccounts, Game>>>,
     /// The game's signer.
     #[validate(writable, data = (GameSignerSeeder{ game: *self.game.info().key() }, self.game.signer_bump))]
     pub game_signer: Seeds<AI, GameSignerSeeder>,
@@ -444,7 +444,8 @@ async fn forfeit_game_test() -> Result<(), Box<dyn Error>> {
     );
 
     // Wait for game to timeout
-    sleep(Duration::from_millis(1500)).await;
+    // This value may need to be adjusted to be longer, we are working on very small timescales
+    sleep(Duration::from_millis(2000)).await;
 
     let receiver = Keypair::new().pubkey();
 

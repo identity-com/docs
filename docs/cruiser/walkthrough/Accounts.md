@@ -167,6 +167,23 @@ impl<S> Default for Board<S>
         Board::Unsolved([[S::default(); 3]; 3])
     }
 }
+impl<S> Board<S> {
+    /// Gets an index of the board if unsolved.
+    pub fn get(&self, index: [u8; 2]) -> Option<&S> {
+        match self {
+            Board::Unsolved(board) => board.get(index[0] as usize)?.get(index[1] as usize),
+            Board::Solved(_) => None,
+        }
+    }
+
+    /// Gets an index mutably of the board if unsolved.
+    pub fn get_mut(&mut self, index: [u8; 2]) -> Option<&mut S> {
+        match self {
+            Board::Unsolved(board) => board.get_mut(index[0] as usize)?.get_mut(index[1] as usize),
+            Board::Solved(_) => None,
+        }
+    }
+}
 
 /// This trait lets us use the same logic for checking winners on the sub-boards and main board.
 pub trait CurrentWinner {
@@ -333,8 +350,6 @@ pub struct PlayerProfile {
     pub losses: u64,
     /// The number of draws this player has.
     pub draws: u64,
-    /// The number of forfeits this player has.
-    pub forfeits: u64,
     /// The amount of lamports this player has won.
     pub lamports_won: u64,
     /// The amount of lamports this player has lost.
@@ -354,7 +369,6 @@ impl PlayerProfile {
             wins: 0,
             losses: 0,
             draws: 0,
-            forfeits: 0,
             lamports_won: 0,
             lamports_lost: 0,
             elo: Self::INITIAL_ELO,
