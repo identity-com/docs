@@ -4,6 +4,8 @@ sidebar_position: 2
 
 # Project Setup
 
+Completed code for this can be found [here](https://github.com/identity-com/cruiser_tutorial).
+
 ## Prerequisites
 
 First we need to ensure we have the needed prerequisites installed.

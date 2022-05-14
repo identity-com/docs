@@ -32,4 +32,13 @@ All accounts a program interacts with (read or write) must be passed in as argum
 
 ### Limitations of what a program can do to an account
 
-An account
+An account has the following rules, even the system program follows these:
+
+* Lamports may not be created or destroyed on instruction check (before CPI or end of instruction)
+* Lamports may only be subtracted from accounts owned by the program
+* Data size may only be changed by the system program (by the owning program once feature `75m6ysz33AfLA5DDEzWM1obBrnPQRSsdVQ2nRmc8Vuu1` is activated, active on devnet)
+* Data size cannot be changed once set except by account wipe if no rent (disabled with feature `75m6ysz33AfLA5DDEzWM1obBrnPQRSsdVQ2nRmc8Vuu1`, active on devnet)
+* Data can only be changed by owner program
+* Data can be wiped by giving the account `0` rent (end of transaction, not instruction)
+* Owner can only be changed by owner program
+* All data must be zeroed to have owner changed
