@@ -406,6 +406,6 @@ impl Processor {
 }
 ```
 
-### Phew! You can see how much easier things are with Cruiser
+### As you can see... things are much simpler with Cruiser than with vanilla Solana
 
-If you'd like to use Cruiser in your next Solana project, please check it out on [Crates.io](https://crates.io/crates/cruiser)
+**If you'd like to use Cruiser in your next Solana project, please check it out on [Crates.io](https://crates.io/crates/cruiser)**
