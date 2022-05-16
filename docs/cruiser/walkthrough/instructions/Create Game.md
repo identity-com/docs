@@ -113,7 +113,7 @@ To start lets look at one of the new account types:
 pub player_profile: ReadOnlyDataAccount<AI, TutorialAccounts, PlayerProfile>,
 ```
 
-This type allows us to access data from an account in a read-only manner. In this case we only need to see the authority of the profile and confirm that it's the same as the authority passed in. You may also notice that this gives us access to all the data despite not needing anything but the authority, this can be solved by the `in_place` feature seen in [the Further Exploration page](../../advanced-topics/In-Place-Data.md).
+This type allows us to access data from an account in a read-only manner. In this case we only need to see the authority of the profile and confirm that it's the same as the authority passed in. You may also notice that this gives us access to all the data despite not needing anything but the authority, this can be solved by the `in_place` feature seen in the Further Exploration section.
 
 ### `InitOrZeroedAccount`
 
