@@ -185,7 +185,7 @@ $ cryptid document --as controlled
 $ cryptid balance --as controlled
 
 # Perform a transfer transaction from the controlled account, signing with the default account.
-$ cryptid transfer me 0.1 --as controlled
+$ cryptid transfer me 10000 --as controlled
 ```
 
 Browse to the link provided to view your transaction on [explorer.identity.com](https://explorer.identity.com/)
