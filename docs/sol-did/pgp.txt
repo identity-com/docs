@@ -1,14 +1,3 @@
-# Sol-Did
-
-Sol-Did is short for Solana Decentralized Identity, the SOL DID method is a method for storing DIDs and managing DID documents on Solana.
-
-## Encryptions
-
-Send encripted message to Identity using the public PGP key below.
-
-[Download the file here](./pgp.txt)
-
-
     mQINBGLe8TQBEAC6im9U42uYLXKaWKGs3RBoCYxmYS3neszQ3HwVZUwohKgibCsG
     ZmXMe85keErAPLf4P9fgWT27rkvLMBTNzjmcUG00iBVE2dqLon20/nJ9AWM8+kNM
     IkiSwg4H6u3FYWeqhR6w0L/QBH4OyZQOi5glkZZtKlTNjwCysrcQCYAXDlNKwuAh
@@ -58,7 +47,3 @@ Send encripted message to Identity using the public PGP key below.
     svYEwJBJjzVx+YPI5nq0LYjmqcR8EEmsyuiMk0GtH7WxWnYUSMw76t9lQmW2a6Bv
     utUWJVD0Ttxdxtc=
     =a86/
-
-## Policies
-
-Not yet implemented.
