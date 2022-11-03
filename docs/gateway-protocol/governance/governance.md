@@ -18,8 +18,6 @@ The purpose of governance is to perform the following tasks:
 
 ## Governance voting
 
-Voters are:
-* Governance token holders (including Gatekeepers)
-* Gateway Pass holders
+Voters are Governance token holders (including Gatekeepers).
 
 Voting power is determined by the amount of tokens the governor holds, the length of time the tokens have been held, and the constraints of the Gateway Pass.
