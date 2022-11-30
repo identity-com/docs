@@ -14,7 +14,7 @@ The Gateway Pass then allows the user to interact with the dApp without any furt
 
 In a soon to be regulated world, dApps will need to comply with KYC/AML and other identity requirements. This is a huge burden for dApps to take on, and it is not in their best interest to do so. Hence, the gateway protocol was built. 
 
-Instead, dApps should be able to rely on a third party to verify the identity of users and issue a Gateway Pass that allows the user to interact with the dApp without further verification prompts. This is the role of Gateway Protocol.
+Instead, dApps should be able to rely on a third party to verify the identity of users and issue a Gateway Pass that allows the user to interact with the dApp without further verification prompts. This is the role of Gatekeepers. 
 
 
 
