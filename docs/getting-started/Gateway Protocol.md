@@ -1,6 +1,5 @@
 ---
-title: Gateway Protocl
-draft: true
+sidebar_position: 2
 ---
 
 # How do I start with Gateway Protocl after I installed it?
