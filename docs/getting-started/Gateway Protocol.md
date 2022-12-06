@@ -21,4 +21,6 @@ Each Gatekeeper network will publish and maintain its own network compensation t
 
 2. use of ON-CHAIN GATEKEEPER: Here on-chain program is the Gatekeeper / Gatekeeper Network
 
-TODO: Story with On-Chain program as a Gatekeeper., DID-state (e.g. you have at least one ETH key linked). You are part of a DAO with XYZ contributions.
+On some cases, dApp may want to have their own Gatekeeper Network. In this case, they can deploy their own Gatekeeper Network program that acts as a gatekeeper. 
+
+On-chain gatekeeper can be a program that is deployed on the blockchain. The program checks the DID state (One Eth key must be linked) or if the user is a part of DAO with XYZ contributions and issues a token to the user. The user can then use the token to access the dApp.
