@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# How do I start with Gateway Protocl after I installed it?
+# How do I start with Gateway Protocol after I installed it?
 
 We have two options once we have installed Gateway Protocol.
 
@@ -10,7 +10,7 @@ We have two options once we have installed Gateway Protocol.
 
 Let's say a particular dApp is in needs to operate KYC checks of users to sell them a particular product, such as alcohol. 
 
-Trusted party such as Socure as a off-chain gatekeeper can provide KYC, Bot Protection, Carbon Utilization, etc. For their services, they can charge a fee to a dApp. When dAPP uses pass operation, Gatekeeper draw funds from dApp's Top-Up Wallet.
+Trusted party such as Socure as an off-chain gatekeeper can provide KYC, Bot Protection, Carbon Utilization, etc. For their services, they can charge a fee to a dApp. When dAPP uses pass operation, Gatekeeper draw funds from dApp's Top-Up Wallet.
 
 Socure Demo: https://zerodayshopping.identity.com
 

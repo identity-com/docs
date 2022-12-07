@@ -22,3 +22,5 @@ In this tutorial, we will walk through the steps to use a EXTERNAL Gatekeeper to
 
 8. click "Make Payment" to make payment with the token.
 
+TODO: Revise to make it more tutorial-like
+
