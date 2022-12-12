@@ -1,8 +1,6 @@
 ---
-title: Overview
-draft: true
+sidebar_position: 1
 ---
-
 # Overview
 
 Welcome to the Identity Documentation!
