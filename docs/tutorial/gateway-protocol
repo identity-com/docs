@@ -6,4 +6,194 @@ sidebar_position: 3
 
 In this tutorial, we will walk through the steps to issue a gateway pass to the user.
 
-TODO: Challenge tutorial 
+First, to make a solana transaction, we will create a new wallet and fund it with SOL.
+
+```ts
+
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+const airdrop = async (
+  connection: Connection,
+  account: PublicKey,
+  amount = LAMPORTS_PER_SOL
+) => {
+  const sigAirdrop = await connection.requestAirdrop(account, amount);
+  const latestBlockHash = await connection.getLatestBlockhash();
+
+  await connection.confirmTransaction({
+    signature: sigAirdrop,
+    blockhash: latestBlockHash.blockhash,
+    lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+  });
+};
+```
+Second, set up a required middleware cryptid.
+
+```ts
+const setupCryptid = async (authority: Wallet, connection: Connection): Promise<CryptidClient> => {
+  // Required Middleware to pass challenge Program
+  const middleware = [
+    {
+      programId: CHECK_DID_MIDDLEWARE_PROGRAM_ID,
+      address: new PublicKey("79Rca2Uu11RJ6i7fbFQPvm2kbTWEEJnzsm8RmWVGwbnB"),
+    },
+  ];
+
+  return Cryptid.buildFromDID(
+    DidSolIdentifier.create(authority.publicKey, cluster).toString(),
+    authority,
+    // middleware,
+    { connection, accountIndex: 1, middlewares: middleware }
+  );
+}
+```
+
+Third, we will propose and execute the transaction.
+
+```ts
+const proposeAndExecute = async (tx: Transaction, cryptid: CryptidClient) => {
+  console.log(JSON.stringify(tx, null, 2));
+  const { proposeTransaction, transactionAccount, proposeSigners } =
+    await cryptid.propose(tx);
+  console.log(`proposeTransaction: ${JSON.stringify(proposeTransaction, null, 2)}`);
+  console.log(`proposeSigners: ${proposeSigners}`);
+  await cryptid.send(proposeTransaction, proposeSigners, { skipPreflight: true });
+
+  // send the execute tx, which fails to pass through the middleware
+  const { executeTransactions, executeSigners } = await cryptid.execute(
+    transactionAccount
+  );
+  await cryptid.send(executeTransactions[0], executeSigners);
+}
+```
+
+Fourth, we will add Eth Key to the user's DID.
+
+```ts
+export const addEthKeyWithOwnershipToDID = async (authority: Wallet) => {
+  const did = DidSolIdentifier.create(authority.publicKey, cluster);
+  const didSolService = DidSolService.build(did, {
+    wallet: authority,
+  });
+
+  // Create a DID Wallet
+  const newEthKey = EthWallet.createRandom();
+  const fragment = `eth-key${Date.now()}`;
+  const newKeyVerificationMethod = {
+    flags: [BitwiseVerificationMethodFlag.CapabilityInvocation],
+    fragment,
+    keyData: Buffer.from(utils.arrayify(newEthKey.address)),
+    methodType: VerificationMethodType.EcdsaSecp256k1RecoveryMethod2020,
+  };
+
+  // Set VM
+  await didSolService.addVerificationMethod(newKeyVerificationMethod).withAutomaticAlloc(authority.publicKey).rpc();
+
+  // Set Ownership flags
+  await didSolService
+    .setVerificationMethodFlags(fragment, [
+      BitwiseVerificationMethodFlag.CapabilityInvocation,
+      BitwiseVerificationMethodFlag.OwnershipProof,
+    ])
+    .withEthSigner(newEthKey)
+    .rpc();
+};
+```
+
+Fifth, we will add service to the user's DID.
+```ts
+export const addServiceToDID = async (authority: Wallet, service: Service) => {
+  const did = DidSolIdentifier.create(authority.publicKey, cluster);
+  const didSolService = DidSolService.build(did, {
+    wallet: authority,
+  });
+
+  await didSolService.addService(service).withAutomaticAlloc(authority.publicKey).rpc();
+};
+```
+
+Once we have done all the steps, we will have a gateway pass issued to the user.
+
+```ts
+(async () => {
+  const connection = new Connection(clusterApiUrl(cluster));
+  // const connection = new Connection("https://rough-misty-night.solana-devnet.quiknode.pro/b57300ff234c12e95763e9b8cda67e9d86772a0d/")
+
+  // generate an authority and airdrop to it.
+  console.log('Setting up authority');
+  const subject = Keypair.generate();
+  // const authority = Keypair.generate();
+  const authority = Keypair.fromSecretKey(Uint8Array.from([89,148,162,75,114,98,180,107,191,170,103,35,203,84,199,180,245,219,130,213,32,66,30,8,17,222,61,92,136,75,87,255,134,47,101,203,156,252,88,184,66,77,86,129,132,84,62,193,4,37,6,36,15,118,82,153,198,2,138,90,237,68,219,250]));
+  const wallet = new NodeWallet(authority)
+  // await airdrop(connection, authority.publicKey);
+
+  const client = IdentityChallengeClient.build({
+    // the network
+    network: new PublicKey("cha3u755qh8GbDayALBwA7ZroFT4NHfPUYgERp16M1z"),
+    // the Gatekeeper
+    gatekeeper: new PublicKey("43tZqtJB8fZvHe4BgKJFxZU1pDaiTeBBES9DVLjbPATg"),
+    // PDA of the challenge Program that is authorized to issue for the gatekeeper
+    gatekeeperAuthority: new PublicKey("yQZBNHqdsquLZKfsUfNMcJqrS9F9rAw5oCEqJAH67MN")
+  }, cluster, {
+    connection,
+    wallet
+  });
+
+  console.log('Setting up Cryptid');
+  // Create Cryptid Account that uses middleware
+  const cryptid = await setupCryptid(wallet, connection);
+  console.log(`cryptid DID: ${cryptid.did}`);
+  console.log(`cryptid address: ${cryptid.address()}`);
+
+  // await airdrop(connection, cryptid.address());
+
+  // TODO: Implement here to be able to pass the challenge
+  // await addEthKeyWithOwnershipToDID(wallet);
+  // await addServiceToDID(wallet, {
+  //   fragment: "test-service",
+  //   serviceType: "profile-pic",
+  //   serviceEndpoint:
+  //     "https://tenor.com/view/vendetta-hats-off-fat-gif-11654529",
+  // });
+
+
+  console.log('Executing Transaction');
+  const tx = await client.issuePass(cryptid.address(), subject.publicKey);
+  // Create issue Transaction
+  await proposeAndExecute(tx, cryptid);
+
+  console.log(`Successfully issued a pass to ${subject.publicKey}`);
+
+})().catch(console.error)
+```
+
+We can now verify that the pass has been issued to the user by running gateway pass verify command from the Identity's Gateway Command Line Interface.
+
+# How to install identity's Gateway CLI
+
+```bash
+$ npm install -g @identity.com/gateway-solana-cli
+```
+
+# How to run the pass verify command
+
+```bash
+USAGE
+  $ gateway pass verify -s <value> -n <value> -c <value> [-h]
+
+FLAGS
+  -c, --cluster=<value>  (required) The cluster you wish to use
+  -h, --help             Show CLI help.
+  -n, --network=<value>  (required) String representing the network's address
+  -s, --subject=<value>  (required) The address to check for a gateway pass
+
+DESCRIPTION
+  Verifies a gateway pass
+
+EXAMPLES
+  $ gateway pass verify --subject [address] --network [address] --keypair [path to keypair] --cluster [cluster type]
+```
+
+
+
+
