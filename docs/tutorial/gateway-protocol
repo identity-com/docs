@@ -4,6 +4,8 @@ sidebar_position: 3
 
 # Tutorial
 
+TODO(JULIAN): IDCOM-2231 Payment Flow Configuration Docs
+
 Github: https://github.com/identity-com/identity-challenge 
 
 In this tutorial, we will walk through the steps to issue a gateway pass to the user.
