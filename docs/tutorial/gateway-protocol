@@ -6,7 +6,7 @@ sidebar_position: 3
 
 TODO(JULIAN): IDCOM-2231 Payment Flow Configuration Docs
 
-Github: https://github.com/identity-com/identity-challenge 
+Github: <https://github.com/identity-com/identity-challenge>
 
 In this tutorial, we will walk through the steps to issue a gateway pass to the user.
 
@@ -69,7 +69,7 @@ const setupCryptid = async (authority: Wallet, connection: Connection): Promise<
 1. Define the function with the required parameters: authority of type Wallet and connection of type Connection.
 2. Create an array of middleware and assign it to the middleware variable: an object with the programId and address properties.
 3. Return a CryptidClient object that is built using the Cryptid class and the buildFromDID method: pass in the DID identifier, authority wallet, and middleware programs as arguments.
-4. Use the setupCryptid function by passing in a Wallet object for the authority parameter and a Connection object for the connection parameter to initialize a CryptidClient object. 
+4. Use the setupCryptid function by passing in a Wallet object for the authority parameter and a Connection object for the connection parameter to initialize a CryptidClient object.
 
 This will return a Promise that will resolve to a CryptidClient object.
 
@@ -142,9 +142,6 @@ export const addEthKeyWithOwnershipToDID = async (authority: Wallet) => {
 3. Call the addEthKeyWithOwnershipToDID function, passing in the authority object as an argument.
 4. This will create a new DID based on the authority object's publicKey, and add a new Ethereum key with ownership proof to it. The updated DID will then be sent to an RPC endpoint.
 5. You can now use the updated DID and its associated Ethereum key for any operations that require ownership proof.
-
-
-
 
 Fifth, we will add service to the user's DID.
 
@@ -232,13 +229,13 @@ Once we have done all the steps, we will have a gateway pass issued to the user.
 
 We can now verify that the pass has been issued to the user by running gateway pass verify command from the Identity's Gateway Command Line Interface.
 
-# How to install identity's Gateway CLI
+## How to install identity's Gateway CLI
 
 ```bash
-$ npm install -g @identity.com/gateway-solana-cli
+npm install -g @identity.com/gateway-solana-cli
 ```
 
-# How to run the pass verify command
+## How to run the pass verify command
 
 ```bash
 USAGE
@@ -254,9 +251,5 @@ DESCRIPTION
   Verifies a gateway pass
 
 EXAMPLES
-  $ gateway pass verify --subject [address] --network [address] --keypair [path to keypair] --cluster [cluster type]
+  $ gateway pass verify --subject [address] --network [address] --cluster [cluster type]
 ```
-
-
-
-
