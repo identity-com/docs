@@ -14,7 +14,7 @@ First, to make a solana transaction, we will create a new wallet and fund it wit
 
 ```ts
 
-//airdrop function takes in a connection and a PublicKey object representing an account, and an optional amount parameter, and uses the requestAirdrop and confirmTransaction methods provided by the Connection object to perform an airdrop on the specified account with the specified amount.
+// The airdrop function takes in a connection and a PublicKey object representing an account, and an optional amount parameter, and uses the requestAirdrop and confirmTransaction methods provided by the Connection object to perform an airdrop on the specified account with the specified amount.
 
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
@@ -46,7 +46,7 @@ Second, set up a required middleware cryptid.
 
 ```ts
 
-//setupCryptid function takes in a Wallet object representing an authority, and a Connection object, and returns a CryptidClient object. The function first initializes an array of middleware programs that need to be passed to the CryptidClient object, then uses the Cryptid.buildFromDID method to build a CryptidClient object, passing in the DID identifier, authority wallet, and middleware programs as arguments.
+// The setupCryptid function takes in a Wallet object representing an authority, and a Connection object, and returns a CryptidClient object. The function first initializes an array of middleware programs that need to be passed to the CryptidClient object, then uses the Cryptid.buildFromDID method to build a CryptidClient object, passing in the DID identifier, authority wallet, and middleware programs as arguments.
 
 const setupCryptid = async (authority: Wallet, connection: Connection): Promise<CryptidClient> => {
   // Required Middleware to pass challenge Program
@@ -77,7 +77,7 @@ Third, we will propose and execute the transaction.
 
 ```ts
 
-//proposeAndExecute function takes in a Transaction object and a CryptidClient object, and logs the transaction and the proposeTransaction and proposeSigners returned by the cryptid.propose method. It then sends the propose transaction to the network, skipping the preflight check. It then sends the executeTransactions and executeSigners returned by the cryptid.execute method to the network.
+// The proposeAndExecute function takes in a Transaction object and a CryptidClient object, and logs the transaction and the proposeTransaction and proposeSigners returned by the cryptid.propose method. It then sends the propose transaction to the network, skipping the preflight check. It then sends the executeTransactions and executeSigners returned by the cryptid.execute method to the network.
 
 const proposeAndExecute = async (tx: Transaction, cryptid: CryptidClient) => {
   console.log(JSON.stringify(tx, null, 2));
@@ -105,7 +105,7 @@ Fourth, we will add Eth Key to the user's DID.
 
 ```ts
 
-//addEthKeyWithOwnershipToDID function takes in a Wallet object representing an authority, and adds an Ethereum key to the authority's DID. The function first creates a DID wallet and a key verification method, then adds the verification method to the DID using the didSolService.addVerificationMethod method, and sets the ownership flags on the verification method using the didSolService.setVerificationMethodFlags method.
+// The addEthKeyWithOwnershipToDID function takes in a Wallet object representing an authority, and adds an Ethereum key to the authority's DID. The function first creates a DID wallet and a key verification method, then adds the verification method to the DID using the didSolService.addVerificationMethod method, and sets the ownership flags on the verification method using the didSolService.setVerificationMethodFlags method.
 
 export const addEthKeyWithOwnershipToDID = async (authority: Wallet) => {
   const did = DidSolIdentifier.create(authority.publicKey, cluster);
@@ -147,7 +147,7 @@ Fifth, we will add service to the user's DID.
 
 ```ts
 
-//addServiceToDID function which takes in a Wallet object representing an authority, and a Service object, and adds the service to the authority's DID using the didSolService.addService method.
+// The addServiceToDID function which takes in a Wallet object representing an authority, and a Service object, and adds the service to the authority's DID using the didSolService.addService method.
 
 export const addServiceToDID = async (authority: Wallet, service: Service) => {
   const did = DidSolIdentifier.create(authority.publicKey, cluster);
@@ -177,7 +177,7 @@ Once we have done all the steps, we will have a gateway pass issued to the user.
 
 (async () => {
   const connection = new Connection(clusterApiUrl(cluster));
-  // const connection = new Connection("https://rough-misty-night.solana-devnet.quiknode.pro/b57300ff234c12e95763e9b8cda67e9d86772a0d/")
+  const connection = new Connection("https://rough-misty-night.solana-devnet.quiknode.pro/b57300ff234c12e95763e9b8cda67e9d86772a0d/")
 
   // generate an authority and airdrop to it.
   console.log('Setting up authority');
@@ -205,16 +205,15 @@ Once we have done all the steps, we will have a gateway pass issued to the user.
   console.log(`cryptid DID: ${cryptid.did}`);
   console.log(`cryptid address: ${cryptid.address()}`);
 
-  // await airdrop(connection, cryptid.address());
+  await airdrop(connection, cryptid.address());
 
-  // TODO: Implement here to be able to pass the challenge
-  // await addEthKeyWithOwnershipToDID(wallet);
-  // await addServiceToDID(wallet, {
-  //   fragment: "test-service",
-  //   serviceType: "profile-pic",
-  //   serviceEndpoint:
-  //     "https://tenor.com/view/vendetta-hats-off-fat-gif-11654529",
-  // });
+  await addEthKeyWithOwnershipToDID(wallet);
+  await addServiceToDID(wallet, {
+    fragment: "test-service",
+    serviceType: "profile-pic",
+    serviceEndpoint:
+      "https://tenor.com/view/vendetta-hats-off-fat-gif-11654529",
+  });
 
 
   console.log('Executing Transaction');
