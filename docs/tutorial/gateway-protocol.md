@@ -254,7 +254,7 @@ EXAMPLES
 # Payments 
 
 When doing a pass operation, the user will be charged a fee. The fee is paid in the supported token(s) that the network and gatekeepers support.
-We specify the fees and the supported tokens when creating networks and gatekeepers
+We specify the fees and the supported tokens when creating networks and gatekeepers. But can be updated later.
 
 The fees are specified as follows
 The gatekeeper specifies a fee in token units, while the network specifies a percentage in hundredths of a percent (0.01% or 0.0001).
@@ -262,9 +262,8 @@ For example:
 The gatekeeper fee is 100 and the network percentage is 500 (5%) 
 The gatekeeper will receive 95 and the network will receive 5.
 
-The fees.token and supportedTokens.key must be the same. Order doesn't matter.
-The network and the gatekeeper must have a matching token.
-
+The `fees.token` for network and `tokenFees.token` for gatekeeper must match `supportedTokens.key`, order doesn't matter.
+The network and the gatekeeper must have at least one matching token to do a pass operation.
 You can specify a different fee for each pass operation issue, refresh, expire and verify.
 
 ```ts
